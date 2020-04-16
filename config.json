@@ -1,0 +1,12 @@
+{
+  "service": {
+    "baseUrl": "http://kertiroz.asuscomm.com:8080/"
+  },
+  "test": {
+    "hooks" : [
+      {
+        "apiEndpoint": "https://ck92fmba400lo1kd39fblby4m@testuser.pryv.me/"
+      }
+    ]
+  }
+}
