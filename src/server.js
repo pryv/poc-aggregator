@@ -31,7 +31,7 @@ app.post('/hook', async (req, res) => {
  *
  * "messages": [
  *  "eventsChanged",
- *   "streamsChanged"
+ *  "streamsChanged"
  * ],
  * "meta": {
  *   "apiVersion": "1.4.11",

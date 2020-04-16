@@ -1,5 +1,8 @@
 const config = require('./config.js');
-const db = require('better-sqlite3')(config.get('database:path'), { verbose: console.log });
+
+const logger = require('./logging');
+
+const db = require('better-sqlite3')(config.get('database:path'), { verbose: logger.info });
 
 db.prepare('CREATE TABLE IF NOT EXISTS hooks (' + 
         'accessId TEXT PRIMARY KEY, ' + // accessId corresponding to apiEndpoint
@@ -28,18 +31,32 @@ const queryGetHookForAccessId = db.prepare(
  * @param {number} status
  * @param {Object} details 
  */
-addHook = (accessId, apiEndpoint, eventsQuery, status, details) => {
+function addHook(accessId, apiEndpoint, eventsQuery, status, details) {
   queryInsertHook.run({ accessId, apiEndpoint, 
     eventsQuery: JSON.stringify(eventsQuery), status, details: JSON.stringify(details)});
 };
 
-hookForAccessId = (accessId) => { 
+/**
+ * 
+ * @param {string} accessId
+ * @returns {Hook} 
+ */
+function hookForAccessId (accessId) { 
   let res = queryGetHookForAccessId.get({ accessId });
   res.eventsQuery = JSON.parse(res.eventsQuery);
   return res;
 }
 
 /**
+ * @typedef Hook
+ * @property {string} apiEndpoint
+ * @property {number} lastSync
+ * @property {Object} eventsQuery
+ * @property {Status} status 
+ */
+
+/**
+ * @typedef Status
  * Enum hook status
  * @readonly
  * @enum {number}

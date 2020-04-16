@@ -2,7 +2,7 @@ const Pryv = require('pryv');
 const storage = require('./storage.js');
 const logger = require('./logging.js');
 const config = require('./config.js');
-
+const queue = require('./queue.js');
 const baseTriggerUrl = config.get('service:baseUrl') + 'trigger/';
 
 
@@ -61,23 +61,6 @@ exports.handleTrigger = async function (accessId, triggerData) {
   if (! triggerData || ! triggerData.messages) {
     throw Error('Invalid or missing trigger messages');
   }
-  
-  //retrieve hook for storage
-  const hook = storage.hookForAccessId(accessId);
-  if (!hook || ! hook.apiEndpoint) {
-    throw Error('Cannot find webhook');
-  }
-
+  queue.addTasks(accessId, triggerData.messages);
   return {result: 'OK'};
-};
-
-
-/**
- * Enum trigger messages 
- * @readonly
- * @enum {string}
- */
-const changes = {
-  EVENTS: 'eventsChanged',
-  STREAMS: 'streamsChanged'
 };
