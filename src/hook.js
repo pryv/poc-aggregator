@@ -5,15 +5,7 @@ const config = require('./config.js');
 
 const baseTriggerUrl = config.get('service:baseUrl') + 'trigger/';
 
-/**
- * handle Triggers from Pryv.io
- * 
- */
-exports.handleTrigger = async function (triggerData) {
-  if (!triggerData || !triggerData.sourceUpdate) {
-    throw Error('Invalid or missing trigger data');
-  }
-};
+
 
 /**
  * 1. Create Web Hook 
@@ -60,25 +52,32 @@ exports.create = async function (pryvApiEndpoint, eventsQuery) {
   return {result: 'OK', actionMsg: actionMsg, webhook: webhookDetails};
 };
 
+/**
+ * handle Triggers from Pryv.io
+ * 
+ */
+exports.handleTrigger = async function (accessId, triggerData) {
+  
+  if (! triggerData || ! triggerData.messages) {
+    throw Error('Invalid or missing trigger messages');
+  }
+  
+  //retrieve hook for storage
+  const hook = storage.hookForAccessId(accessId);
+  if (!hook || ! hook.apiEndpoint) {
+    throw Error('Cannot find webhook');
+  }
 
+  return {result: 'OK'};
+};
 
 
 /**
- * check all users that need to be updated
- * Known to be BOGUS  and UNFINISHED
+ * Enum trigger messages 
+ * @readonly
+ * @enum {string}
  */
-async function checkForUpdateAll() {
-  const ulist = storage.getAllToBeSynched();
-  return await Promise.all(ulist.map(async function (user) {
-    const params = {
-      pryvEndpoint: user.pryvEndpoint,
-      thryveToken: user.thryveToken,
-      startDate: new Date(user.lastSynch),
-      endDate: new Date(),
-      thryveSourceCode: -1
-    };
-    await fetchFromThryveToPryv({...params}, true);
-  }));
-}
-
-exports.checkForUpdateAll = checkForUpdateAll;
+const changes = {
+  EVENTS: 'eventsChanged',
+  STREAMS: 'streamsChanged'
+};

@@ -33,9 +33,10 @@ addHook = (accessId, apiEndpoint, eventsQuery, status, details) => {
     eventsQuery: JSON.stringify(eventsQuery), status, details: JSON.stringify(details)});
 };
 
-hookForAccessId = (accesId) => { 
+hookForAccessId = (accessId) => { 
   let res = queryGetHookForAccessId.get({ accessId });
   res.eventsQuery = JSON.parse(res.eventsQuery);
+  return res;
 }
 
 /**
