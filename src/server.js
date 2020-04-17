@@ -41,7 +41,7 @@ app.post('/hook', async (req, res) => {
  */
 app.post('/trigger/:accessId', async (req, res) => {
   try {
-    
+    console.log('Trigger ', req.params.accessId, req.body);
     const result = await hook.handleTrigger(req.params.accessId, req.body);
     return res.status(200).send({result: 'OK'});
   } catch (error) {
@@ -50,5 +50,7 @@ app.post('/trigger/:accessId', async (req, res) => {
   }
 });
 
+
+hook.reactivateAllHooks();
 
 app.listen(port, () => console.log(`Pryv Webhook Aggregator listening on port ${port}!`))

@@ -6,6 +6,7 @@ const queue = require('./queue.js');
 const baseTriggerUrl = config.get('service:baseUrl') + 'trigger/';
 
 
+console.log(queue);
 
 /**
  * 1. Create Web Hook 
@@ -48,9 +49,14 @@ exports.create = async function (pryvApiEndpoint, eventsQuery) {
     throw new Error('Failed creating WebHook');
   }
 
-  storage.addHook(accessInfo.id, pryvApiEndpoint, eventsQuery, storage.status.ACTIVE, webhookDetails);
+  storage.addHook(
+    accessInfo.id, webhookDetails.id, pryvApiEndpoint, 
+    eventsQuery, storage.status.ACTIVE, webhookDetails);
+    
+  queue.addTasks(hook.accessId, [queue.Changes.ACTIVATE, queue.Changes.EVENTS, queue.Changes.STREAMS]);
   return {result: 'OK', actionMsg: actionMsg, webhook: webhookDetails};
 };
+
 
 /**
  * handle Triggers from Pryv.io
@@ -61,6 +67,30 @@ exports.handleTrigger = async function (accessId, triggerData) {
   if (! triggerData || ! triggerData.messages) {
     throw Error('Invalid or missing trigger messages');
   }
-  queue.addTasks(accessId, triggerData.messages);
+  const changes = [];
+  // convert TEST & BOOT to changeStream and changeEvents
+  triggerData.messages.forEach((change) => { 
+    switch (change) {
+      case queue.Changes.TEST:
+      case queue.Changes.BOOT:
+        changes.push(queue.Changes.STREAMS);
+        changes.push(queue.Changes.EVENTS);
+      break;
+      default:
+        changes.push(change);
+      break;
+    }
+  });
+  queue.addTasks(accessId, changes);
   return {result: 'OK'};
 };
+
+
+/**
+ * Check all hooks status and reactivate them
+ */
+exports.reactivateAllHooks = function() {
+  storage.allHooksAccessIds().forEach((hook) => { 
+    queue.addTasks(hook.accessId, [queue.Changes.ACTIVATE, queue.Changes.EVENTS, queue.Changes.STREAMS]);
+  });
+}

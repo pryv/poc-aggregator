@@ -29,14 +29,14 @@ function addTasks(accessId, taskList) {
     next();
   }
 }
-module.exports = {
-  addTasks: addTasks
-}
 
 /**
  * @typedef Changes
  * @property {string} EVENTS "eventsChanged"
  * @property {string} STREAMS "streamsChanged"
+ * @property {string} ACTIVATE "activate"
+ * @property {string} TEST "test"
+ * @property {string} BOOT "webhooksServiceBoot"
  */
 
 /** 
@@ -46,9 +46,16 @@ module.exports = {
  */
 const Changes = {
   EVENTS: 'eventsChanged',
-  STREAMS: 'streamsChanged'
+  STREAMS: 'streamsChanged',
+  ACTIVATE: 'activate',
+  TEST: 'test',
+  BOOT: 'webhooksServiceBoot' 
 };
-exports.Changes = Changes;
+
+module.exports = {
+  addTasks: addTasks,
+  Changes: Changes
+}
 
 // ----------- internals --------- ///
 
@@ -89,11 +96,14 @@ async function doTask(accessId, taskSet) {
   
   for (let change of taskSet) {
     switch (change) {
+      case Changes.ACTIVATE:
+        await activateHook(accessId, conn, hook);
+      break;
       case Changes.EVENTS: 
-        const lastModified = await getEvents(accessId, conn, hook);
+        await getEvents(accessId, conn, hook);
       break;
       case Changes.STREAMS:
-
+        await getStreams(accessId, conn, hook);
       break;
     }
   }
@@ -101,10 +111,26 @@ async function doTask(accessId, taskSet) {
  
 }
 
+async function activateHook(accessId, conn, hook) {
+  const res = await conn.api([{
+    method: 'webhooks.update',
+    params: { id: 'ck92g505000m81fd3flsxgwdb', update: { state: 'active' }}
+  }]);
+  if (res && res[0] && res[0].webhook) {
+    storage.updateHookDetail(accessId, res[0].webhook);
+  }
 
+  console.log(JSON.stringify(res));
+}
+
+async function getStreams(accessId, conn, hook) {
+  const result = await conn.get('streams');
+  listners.newStreams(accessId, result.streams);
+}
 
 async function getEvents(accessId, conn, hook) {
   const queryParams = {
+    limit: 5,
     fromTime: - Number.MAX_VALUE,
     setTime: Number.MAX_VALUE
   }
@@ -122,10 +148,8 @@ async function getEvents(accessId, conn, hook) {
     } else { 
       listners.newOrUpdateEvent(accessId, event);
     }
-    
   }
-  
-  await conn.getEventsStreamed(queryParams, forEachEvent)
-  console.log(lastModified);
+  await conn.getEventsStreamed(queryParams, forEachEvent);
+  storage.updateLastSync(accessId, lastModified * 1000);
   return lastModified * 1000;
 }
