@@ -1,5 +1,5 @@
 
-const logger = require('../logging');
+const logger = require('../utils/logging');
 
 function log(accessId, call, msg) {
   logger.info('Listener [' + accessId + '] - ' + call + ' > ' + msg);

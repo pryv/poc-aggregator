@@ -1,17 +1,14 @@
 const Pryv = require('pryv');
 const storage = require('./storage.js');
-const logger = require('./logging.js');
-const config = require('./config.js');
-const queue = require('./queue.js');
+const logger = require('./utils/logging.js');
+const config = require('./utils/config.js');
+const tasks = require('./tasks.js');
 const baseTriggerUrl = config.get('service:baseUrl') + 'trigger/';
-
-
-console.log(queue);
 
 /**
  * 1. Create Web Hook 
  * 2. Store 
- * 3. Add to update queue 
+ * 3. Add to tasks queue 
  */
 exports.create = async function (pryvApiEndpoint, eventsQuery) {
   const conn = new Pryv.Connection(pryvApiEndpoint);
@@ -53,7 +50,7 @@ exports.create = async function (pryvApiEndpoint, eventsQuery) {
     accessInfo.id, webhookDetails.id, pryvApiEndpoint, 
     eventsQuery, storage.status.ACTIVE, webhookDetails);
     
-  queue.addTasks(hook.accessId, [queue.Changes.ACTIVATE, queue.Changes.EVENTS, queue.Changes.STREAMS]);
+  tasks.addTasks(hook.accessId, [tasks.Changes.ACTIVATE, tasks.Changes.STREAMS, tasks.Changes.EVENTS]);
   return {result: 'OK', actionMsg: actionMsg, webhook: webhookDetails};
 };
 
@@ -71,17 +68,17 @@ exports.handleTrigger = async function (accessId, triggerData) {
   // convert TEST & BOOT to changeStream and changeEvents
   triggerData.messages.forEach((change) => { 
     switch (change) {
-      case queue.Changes.TEST:
-      case queue.Changes.BOOT:
-        changes.push(queue.Changes.STREAMS);
-        changes.push(queue.Changes.EVENTS);
+      case tasks.Changes.TEST:
+      case tasks.Changes.BOOT:
+        changes.push(tasks.Changes.STREAMS);
+        changes.push(tasks.Changes.EVENTS);
       break;
       default:
         changes.push(change);
       break;
     }
   });
-  queue.addTasks(accessId, changes);
+  tasks.addTasks(accessId, changes);
   return {result: 'OK'};
 };
 
@@ -91,6 +88,6 @@ exports.handleTrigger = async function (accessId, triggerData) {
  */
 exports.reactivateAllHooks = function() {
   storage.allHooksAccessIds().forEach((hook) => { 
-    queue.addTasks(hook.accessId, [queue.Changes.ACTIVATE, queue.Changes.EVENTS, queue.Changes.STREAMS]);
+    tasks.addTasks(hook.accessId, [tasks.Changes.ACTIVATE, tasks.Changes.EVENTS, tasks.Changes.STREAMS]);
   });
 }

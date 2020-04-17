@@ -1,5 +1,5 @@
 /*global describe, it */
-const config = require('../../src/config.js'),
+const config = require('../../src/utils/config.js'),
   request = require('superagent');
 
 

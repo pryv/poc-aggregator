@@ -2,7 +2,7 @@
  * Tasks are queued to be processed asynchronously.
  * 
  */
-const logger = require('./logging');
+const logger = require('./utils/logging');
 const storage = require('./storage');
 const Pryv = require('pryv');
 const listners = require('./listners');
@@ -68,7 +68,6 @@ async function next() {
   running = false;
   const accessId = queue.pop();
   const taskSet = tasks[accessId];
-  console.log(tasks);
   if (! taskSet) { 
     throw new Error('Integrity Error ');
   }
@@ -107,8 +106,6 @@ async function doTask(accessId, taskSet) {
       break;
     }
   }
-
- 
 }
 
 async function activateHook(accessId, conn, hook) {
@@ -119,8 +116,6 @@ async function activateHook(accessId, conn, hook) {
   if (res && res[0] && res[0].webhook) {
     storage.updateHookDetail(accessId, res[0].webhook);
   }
-
-  console.log(JSON.stringify(res));
 }
 
 async function getStreams(accessId, conn, hook) {
@@ -136,6 +131,7 @@ async function getEvents(accessId, conn, hook) {
   }
   Object.assign(queryParams, hook.eventsQuery);
   queryParams.includeDeletions = true;
+  queryParams.state = 'all';
   queryParams.modifiedSince = hook.lastSync / 1000;
   
   let lastModified = queryParams.modifiedSince;

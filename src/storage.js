@@ -1,6 +1,6 @@
-const config = require('./config.js');
+const config = require('./utils/config.js');
 
-const logger = require('./logging');
+const logger = require('./utils/logging');
 
 const db = require('better-sqlite3')(config.get('database:path'), { verbose: logger.info });
 

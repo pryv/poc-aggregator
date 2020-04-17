@@ -1,11 +1,11 @@
 const express = require('express');
-const config = require('./config.js');
+const config = require('./utils/config.js');
 const app = express();
 app.use(require('body-parser').json());
 
 const hook = require('./hook.js');
 const storage = require('./storage.js');
-
+const logger = require('./utils/logging.js');
 const port = config.get('server:port');
 
 app.get('/', (req, res) => res.send('Hello World!'));
@@ -21,7 +21,7 @@ app.post('/hook', async (req, res) => {
     const response = await hook.create(req.body.pryvApiEndpoint, {});
     res.send(response)
   } catch (error) {
-    console.log('Error Creating hook: ', error);
+    logger.error('Error Creating hook: ', error);
     res.status(500).send('Something broke!');
   }
 });
@@ -41,11 +41,11 @@ app.post('/hook', async (req, res) => {
  */
 app.post('/trigger/:accessId', async (req, res) => {
   try {
-    console.log('Trigger ', req.params.accessId, req.body);
+    logger.info('Trigger ', req.params.accessId, req.body);
     const result = await hook.handleTrigger(req.params.accessId, req.body);
     return res.status(200).send({result: 'OK'});
   } catch (error) {
-    console.log('Error Trigger Res: ', error);
+    logger.error('Error Trigger Res: ', error);
     res.status(500).send('Something broke!');
   }
 });
@@ -53,4 +53,4 @@ app.post('/trigger/:accessId', async (req, res) => {
 
 hook.reactivateAllHooks();
 
-app.listen(port, () => console.log(`Pryv Webhook Aggregator listening on port ${port}!`))
+app.listen(port, () => logger.info(`Pryv Webhook Aggregator listening on port ${port}!`))
