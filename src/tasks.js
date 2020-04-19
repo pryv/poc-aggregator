@@ -1,11 +1,14 @@
 /**
- * Tasks are queued to be processed asynchronously.
+ * Tasks 
+ * 
+ * Holds a "queue" with tasks 
+ *  - queue keeps in order 
  * 
  */
 const logger = require('./utils/logging');
-const storage = require('./storage');
+const storage = require('./state-storage/');
 const Pryv = require('pryv');
-const listners = require('./listners');
+const listners = require('./data-listeners');
 
 const queue = []; // in-order accessIds to process
 const tasks = {}; // key - value set of tasks per accessIds
@@ -85,8 +88,8 @@ async function next() {
  * @param {Set} taskSet 
  */
 async function doTask(accessId, taskSet) { 
-  const hook = storage.hookForAccessId(accessId);
-  if (! hook) { 
+  const hook = await storage.hookForAccessId(accessId);
+  if (! hook || ! hook.apiEndpoint) { 
     logger.error('Cannot find hook for accessId: ' + accessId);
     return; 
   }
@@ -114,7 +117,7 @@ async function activateHook(accessId, conn, hook) {
     params: { id: 'ck92g505000m81fd3flsxgwdb', update: { state: 'active' }}
   }]);
   if (res && res[0] && res[0].webhook) {
-    storage.updateHookDetail(accessId, res[0].webhook);
+    await storage.updateHookDetail(accessId, res[0].webhook);
   }
 }
 
@@ -146,6 +149,6 @@ async function getEvents(accessId, conn, hook) {
     }
   }
   await conn.getEventsStreamed(queryParams, forEachEvent);
-  storage.updateLastSync(accessId, lastModified * 1000);
+  await storage.updateLastSync(accessId, lastModified * 1000);
   return lastModified * 1000;
 }

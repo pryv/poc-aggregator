@@ -6,6 +6,25 @@
   "service": {
     "baseUrl": "http://kertiroz.asuscomm.com:8080/"
   },
+  "state-storage": {
+    "module": "StateStorageSqlite",
+    "params": {
+      "dbfile": "./db-states.sqlite"
+    }
+  },
+  "data-listeners": [
+    {
+      "module": "console",
+      "params": {}
+    },
+    {
+      "module": "sqlite",
+      "params": {
+        "file": "./db-data.sqlite"
+      }
+    }
+  ]
+  ,
   "test": {
     "hooks" : [
       {

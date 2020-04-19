@@ -4,7 +4,10 @@ const app = express();
 app.use(require('body-parser').json());
 
 const hook = require('./hook.js');
-const storage = require('./storage.js');
+/**
+ * @type {StateStoragInterface}
+ */
+const stateStorage = require('./state-storage/');
 const logger = require('./utils/logging.js');
 const port = config.get('server:port');
 
@@ -50,7 +53,11 @@ app.post('/trigger/:accessId', async (req, res) => {
   }
 });
 
+(async () => {
+  await stateStorage.init();
+  await hook.reactivateAllHooks();
+})
 
-hook.reactivateAllHooks();
+
 
 app.listen(port, () => logger.info(`Pryv Webhook Aggregator listening on port ${port}!`))

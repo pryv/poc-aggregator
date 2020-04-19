@@ -1,5 +1,5 @@
 const Pryv = require('pryv');
-const storage = require('./storage.js');
+const storage = require('./state-storage/');
 const logger = require('./utils/logging.js');
 const config = require('./utils/config.js');
 const tasks = require('./tasks.js');
@@ -50,7 +50,7 @@ exports.create = async function (pryvApiEndpoint, eventsQuery) {
     accessInfo.id, webhookDetails.id, pryvApiEndpoint, 
     eventsQuery, storage.status.ACTIVE, webhookDetails);
     
-  tasks.addTasks(hook.accessId, [tasks.Changes.ACTIVATE, tasks.Changes.STREAMS, tasks.Changes.EVENTS]);
+  tasks.addTasks(accessInfo.id, [tasks.Changes.ACTIVATE, tasks.Changes.STREAMS, tasks.Changes.EVENTS]);
   return {result: 'OK', actionMsg: actionMsg, webhook: webhookDetails};
 };
 
@@ -86,8 +86,8 @@ exports.handleTrigger = async function (accessId, triggerData) {
 /**
  * Check all hooks status and reactivate them
  */
-exports.reactivateAllHooks = function() {
-  storage.allHooksAccessIds().forEach((hook) => { 
+exports.reactivateAllHooks = async function() {
+  await storage.allHooksAccessIds().forEach((hook) => { 
     tasks.addTasks(hook.accessId, [tasks.Changes.ACTIVATE, tasks.Changes.EVENTS, tasks.Changes.STREAMS]);
   });
 }
