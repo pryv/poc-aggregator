@@ -27,8 +27,8 @@ class DataListenerConsole extends DataChangesListenersInterface { 
    * @param {string} triggerId 
    * @param {Hook} hook 
    */
-  newHook(triggerId, hook) {
-    log(triggerId, 'New Hook');
+  newHook(triggerId, data) {
+    log(triggerId, 'New Hook', data.pryvApiEndpoint);
   }
 
   /**

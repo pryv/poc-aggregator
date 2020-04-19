@@ -5,6 +5,7 @@ const config = require('./utils/config.js');
 const tasks = require('./tasks.js');
 const baseTriggerUrl = config.get('service:baseUrl') + 'trigger/';
 const cuid = require('cuid');
+const listners = require('./data-change');
 
 /**
  * 1. Create Web Hook 
@@ -56,7 +57,8 @@ exports.create = async function (pryvApiEndpoint, eventsQuery) {
   stateStorage.addHook(
     triggerId, webhookDetails.id, pryvApiEndpoint, 
     eventsQuery, stateStorage.status.ACTIVE, webhookDetails);
-    
+  
+  listners.newHook(triggerId, {pryvApiEndpoint, hook: webhookDetails});
   tasks.addTasks(triggerId, [tasks.Changes.ACTIVATE, tasks.Changes.STREAMS, tasks.Changes.EVENTS]);
   return { result: 'OK', actionMsg: actionMsg, webhook: webhookDetails, triggerId: triggerId};
 };
@@ -96,5 +98,9 @@ exports.handleTrigger = async function (triggerId, triggerData) {
 exports.reactivateAllHooks = async function() {
   await stateStorage.allHookstriggerIds().forEach((hook) => { 
     tasks.addTasks(hook.triggerId, [tasks.Changes.ACTIVATE, tasks.Changes.EVENTS, tasks.Changes.STREAMS]);
+    // optimize here!!!!
+
+    // Load EVENTS and STREAMS only if last run was Faulty .. 
+
   });
 }

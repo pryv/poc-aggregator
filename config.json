@@ -9,13 +9,21 @@
   "state-storage": {
     "module": "StateStorageSqlite",
     "params": {
-      "dbfile": "./db-states.sqlite"
+      "dbfile": "./db-states.sqlite",
+      "log": false
     }
   },
   "data-listeners": [
     {
       "module": "DataListenerConsole",
       "params": {}
+    },
+    {
+      "module": "DataListenerSQLite",
+      "params": {
+        "dbfile": "./db-data.sqlite",
+        "log": false
+      }
     }
   ]
   ,

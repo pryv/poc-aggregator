@@ -118,6 +118,7 @@ async function activateHook(triggerId, conn, hook) {
   }]);
   if (res && res[0] && res[0].webhook) {
     await storage.updateHookDetail(triggerId, res[0].webhook);
+    listners.newHook(triggerId, {pryvApiEndpoint: conn.apiEndpoint, hook: res[0].webhook});
   }
 }
 

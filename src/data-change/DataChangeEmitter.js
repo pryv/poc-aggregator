@@ -28,10 +28,12 @@ class DataChangeEmitter extends EventEmitter {
    * advertised on new Hook
    * - !! hook contains the credential to acces the account and might not be stored
    * @param {string} triggerId 
-   * @param {Hook} hook 
+   * @param {Object} data
+   * @param {string} data.pryvApiEndpoint
+   * @param {Hook} data.hook
    */
-  newHook(triggerId, hook) {
-    this.emit(DataChangesNames.HOOK.NEW, triggerId, hook);
+  newHook(triggerId, data) {
+    this.emit(DataChangesNames.HOOK.NEW, triggerId, data);
   }
 
   /**

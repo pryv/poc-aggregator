@@ -5,7 +5,7 @@ class StateStorageSqlite extends StateStorageInterface {
 
   constructor(params) {
     super(params);
-    const db = require('better-sqlite3')(params.dbfile, { verbose: logger.info });
+    const db = require('better-sqlite3')(params.dbfile, { verbose: params.log ? logger.info : function() {} });
     logger.info('StateStorage: Sqlite - ' + params.dbfile);
 
     db.prepare('CREATE TABLE IF NOT EXISTS hooks (' +
