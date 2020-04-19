@@ -14,14 +14,8 @@
   },
   "data-listeners": [
     {
-      "module": "console",
+      "module": "DataListenerConsole",
       "params": {}
-    },
-    {
-      "module": "sqlite",
-      "params": {
-        "file": "./db-data.sqlite"
-      }
     }
   ]
   ,

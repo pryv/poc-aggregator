@@ -8,7 +8,7 @@
 const logger = require('./utils/logging');
 const storage = require('./state-storage/');
 const Pryv = require('pryv');
-const listners = require('./data-listeners');
+const listners = require('./data-change');
 
 const queue = []; // in-order accessIds to process
 const tasks = {}; // key - value set of tasks per accessIds
