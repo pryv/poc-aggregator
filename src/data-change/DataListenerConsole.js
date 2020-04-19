@@ -3,8 +3,8 @@ const logger = require('../utils/logging');
 
 const { DataChangesNames, DataChangesListenersInterface } = require('./DataChangesDefinitions');
 
-function log(accessId, call, msg) {
-  logger.info('Listener [' + accessId + '] - ' + call + ' > ' + msg);
+function log(triggerId, call, msg) {
+  logger.info('Listener [' + triggerId + '] - ' + call + ' > ' + msg);
 }
 
 
@@ -24,54 +24,54 @@ class DataListenerConsole extends DataChangesListenersInterface { 
   /**
    * advertised on new Hook
    * - !! hook contains the credential to acces the account and might not be stored
-   * @param {string} accessId 
+   * @param {string} triggerId 
    * @param {Hook} hook 
    */
-  newHook(accessId, hook) {
-    log(accessId, 'New Hook');
+  newHook(triggerId, hook) {
+    log(triggerId, 'New Hook');
   }
 
   /**
    * advertised on a deleted Hook
    * - All data relative to this access should be deleted
-   * @param {string} accessId 
+   * @param {string} triggerId 
    * @param {Hook} hook 
    */
-  deleteHook(accessId) {
-    log(accessId, 'Delete Hook');
+  deleteHook(triggerId) {
+    log(triggerId, 'Delete Hook');
   }
 
   /**
    * advertised on new Event
    * - Event should be added or updated
-   * @param {string} accessId 
+   * @param {string} triggerId 
    * @param {string} apiEndpoint
    * @param {Object} event
    */
-  newOrUpdateEvent(accessId, event) {
-    log(accessId, 'New Event', event.id + ' ' + event.type + ' > ' + event.content);
+  newOrUpdateEvent(triggerId, event) {
+    log(triggerId, 'New Event', event.id + ' ' + event.type + ' > ' + event.content);
   }
 
   /**
    * advertised on a deleted Event
    * - Event should be removed
-   * @param {string} accessId 
+   * @param {string} triggerId 
    * @param {string} apiEndpoint
    * @param {Object} event
    */
-  deleteEvent(accessId, event) {
-    log(accessId, 'Delete Event', event.id);
+  deleteEvent(triggerId, event) {
+    log(triggerId, 'Delete Event', event.id);
   }
 
   /**
    * advertised on a new Stream Structure
    * - List of streams should be updated
-   * @param {string} accessId 
+   * @param {string} triggerId 
    * @param {string} apiEndpoint
    * @param {Object} streams
    */
-  newOrUpdateStreams(accessId, streams) {
-    log(accessId, 'New Streams', streams.length);
+  newOrUpdateStreams(triggerId, streams) {
+    log(triggerId, 'New Streams', streams.length);
   }
 
 }

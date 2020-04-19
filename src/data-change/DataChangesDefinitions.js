@@ -1,8 +1,8 @@
 
 const dataChangesNames = {
   HOOK: {
-    NEW: 'newHook', // params: { accessId, hook },
-    DELETE: 'deleteHook', // params: "accessId"
+    NEW: 'newHook', // params: { triggerId, hook },
+    DELETE: 'deleteHook', // params: "triggerId"
   },
   EVENT: {
     NEW_OR_UPDATE: 'newOrUpdateEvent', // params: event

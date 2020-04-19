@@ -21,6 +21,7 @@
   "dependencies": {
     "better-sqlite3": "^5.4.1",
     "body-parser": "^1.19.0",
+    "cuid": "^2.1.8",
     "express": "^4.17.1",
     "nconf": "^0.10.0",
     "pryv": "^2.0.1",

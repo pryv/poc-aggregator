@@ -42,10 +42,10 @@ app.post('/hook', async (req, res) => {
  *   "serverTime": 1586845324.691
  * }
  */
-app.post('/trigger/:accessId', async (req, res) => {
+app.post('/trigger/:triggerId', async (req, res) => {
   try {
-    logger.info('Trigger ', req.params.accessId, req.body);
-    const result = await hook.handleTrigger(req.params.accessId, req.body);
+    logger.info('Trigger ', req.params.triggerId, req.body);
+    const result = await hook.handleTrigger(req.params.triggerId, req.body);
     return res.status(200).send({result: 'OK'});
   } catch (error) {
     logger.error('Error Trigger Res: ', error);

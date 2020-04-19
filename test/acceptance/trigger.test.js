@@ -12,7 +12,7 @@ const testhook = config.get('test:hooks')[0];
 describe('Trigger', function () {
 
   it('Create', function (done) {
-    request.post(serverBasePath + '/trigger/' + testhook.accessId)
+    request.post(serverBasePath + '/trigger/' + testhook.triggerId)
       .set('Accept', 'application/json')
       .set('Accept-Charset', 'utf-8')
       .set('Accept-Encoding', 'gzip, deflate')

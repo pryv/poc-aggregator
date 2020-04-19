@@ -10,23 +10,23 @@ const storage = require('./state-storage/');
 const Pryv = require('pryv');
 const listners = require('./data-change');
 
-const queue = []; // in-order accessIds to process
-const tasks = {}; // key - value set of tasks per accessIds
+const queue = []; // in-order triggerIds to process
+const tasks = {}; // key - value set of tasks per triggerIds
 let running = false; // set to true when queue is currently running
 
 
 /**
-* Add a new task for this accessId
-* @param {string} accessId
+* Add a new task for this triggerId
+* @param {string} triggerId
 * @param {Array<Changes>} taskList
 */
-function addTasks(accessId, taskList) { 
+function addTasks(triggerId, taskList) { 
   taskList.forEach(task => {
-    if (!tasks[accessId]) {
-      tasks[accessId] = new Set(); // to ensure unicity of tasks
-      queue.unshift(accessId);
+    if (!tasks[triggerId]) {
+      tasks[triggerId] = new Set(); // to ensure unicity of tasks
+      queue.unshift(triggerId);
     }
-    tasks[accessId].add(task);
+    tasks[triggerId].add(task);
   });
   if (! running) {
     next();
@@ -69,28 +69,28 @@ async function next() {
     return;
   }
   running = false;
-  const accessId = queue.pop();
-  const taskSet = tasks[accessId];
+  const triggerId = queue.pop();
+  const taskSet = tasks[triggerId];
   if (! taskSet) { 
     throw new Error('Integrity Error ');
   }
-  delete tasks[accessId]; 
+  delete tasks[triggerId]; 
 
   // set a next action in xx ms 
   setTimeout(async function () {
-    await doTask(accessId, taskSet);
+    await doTask(triggerId, taskSet);
     next();
   }, 500); // too long should be changed an paralellized
 }
 
 /**
- * @param {string} accessId 
+ * @param {string} triggerId 
  * @param {Set} taskSet 
  */
-async function doTask(accessId, taskSet) { 
-  const hook = await storage.hookForAccessId(accessId);
+async function doTask(triggerId, taskSet) { 
+  const hook = await storage.hookFortriggerId(triggerId);
   if (! hook || ! hook.apiEndpoint) { 
-    logger.error('Cannot find hook for accessId: ' + accessId);
+    logger.error('Cannot find hook for triggerId: ' + triggerId);
     return; 
   }
   // get connextion
@@ -99,34 +99,34 @@ async function doTask(accessId, taskSet) {
   for (let change of taskSet) {
     switch (change) {
       case Changes.ACTIVATE:
-        await activateHook(accessId, conn, hook);
+        await activateHook(triggerId, conn, hook);
       break;
       case Changes.EVENTS: 
-        await getEvents(accessId, conn, hook);
+        await getEvents(triggerId, conn, hook);
       break;
       case Changes.STREAMS:
-        await getStreams(accessId, conn, hook);
+        await getStreams(triggerId, conn, hook);
       break;
     }
   }
 }
 
-async function activateHook(accessId, conn, hook) {
+async function activateHook(triggerId, conn, hook) {
   const res = await conn.api([{
     method: 'webhooks.update',
     params: { id: 'ck92g505000m81fd3flsxgwdb', update: { state: 'active' }}
   }]);
   if (res && res[0] && res[0].webhook) {
-    await storage.updateHookDetail(accessId, res[0].webhook);
+    await storage.updateHookDetail(triggerId, res[0].webhook);
   }
 }
 
-async function getStreams(accessId, conn, hook) {
+async function getStreams(triggerId, conn, hook) {
   const result = await conn.get('streams');
-  listners.newStreams(accessId, result.streams);
+  listners.newStreams(triggerId, result.streams);
 }
 
-async function getEvents(accessId, conn, hook) {
+async function getEvents(triggerId, conn, hook) {
   const queryParams = {
     limit: 5,
     fromTime: - Number.MAX_VALUE,
@@ -143,12 +143,12 @@ async function getEvents(accessId, conn, hook) {
       lastModified = event.modified;
     }
     if (event.deleted) {
-      listners.deletedEvent(accessId, event);
+      listners.deletedEvent(triggerId, event);
     } else { 
-      listners.newOrUpdateEvent(accessId, event);
+      listners.newOrUpdateEvent(triggerId, event);
     }
   }
   await conn.getEventsStreamed(queryParams, forEachEvent);
-  await storage.updateLastSync(accessId, lastModified * 1000);
+  await storage.updateLastSync(triggerId, lastModified * 1000);
   return lastModified * 1000;
 }

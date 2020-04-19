@@ -9,7 +9,7 @@ class StateStorageSqlite extends StateStorageInterface {
     logger.info('StateStorage: Sqlite - ' + params.dbfile);
 
     db.prepare('CREATE TABLE IF NOT EXISTS hooks (' +
-      'accessId TEXT PRIMARY KEY, ' + // accessId corresponding to apiEndpoint
+      'triggerId TEXT PRIMARY KEY, ' + // triggerId corresponding to apiEndpoint
       'hookId TEXT UNIQUE, ' + // id of the Hook for Pryv.io
       'apiEndpoint TEXT, ' + // pryvApiEndpoint https://{token}@{path}
       'lastSync INTEGER DEFAULT -9223372036854775808, ' + // last synch time sent by API
@@ -26,17 +26,17 @@ class StateStorageSqlite extends StateStorageInterface {
 
     this.queries = {
       insertHook: db.prepare('INSERT OR REPLACE INTO hooks ' +
-        '(accessId, hookId, apiEndpoint, eventsQuery, status, details) VALUES ' +
-        '(@accessId, @hookId, @apiEndpoint, @eventsQuery, @status, @details)'),
+        '(triggerId, hookId, apiEndpoint, eventsQuery, status, details) VALUES ' +
+        '(@triggerId, @hookId, @apiEndpoint, @eventsQuery, @status, @details)'),
       updateHookDetail: db.prepare(
-        'UPDATE hooks SET details = @details WHERE accessId = @accessId'),
+        'UPDATE hooks SET details = @details WHERE triggerId = @triggerId'),
       updateLastSync: db.prepare(
-        'UPDATE hooks SET lastSync = @lastSync WHERE accessId = @accessId'),
-      getHookForAccessId: db.prepare(
+        'UPDATE hooks SET lastSync = @lastSync WHERE triggerId = @triggerId'),
+      getHookFortriggerId: db.prepare(
         'SELECT apiEndpoint, hookId, lastSync, eventsQuery, status ' +
-        'FROM hooks WHERE accessId = @accessId'),
-      allHooksAccessIds: db.prepare(
-        'SELECT accessId FROM hooks')
+        'FROM hooks WHERE triggerId = @triggerId'),
+      allHookstriggerIds: db.prepare(
+        'SELECT triggerId FROM hooks')
     }
   }
 
@@ -47,9 +47,9 @@ class StateStorageSqlite extends StateStorageInterface {
    * @param {HookStatus} status
    * @param {Object} details 
    */
-  async addHook(accessId, hookId, apiEndpoint, eventsQuery, status, details) {
+  async addHook(triggerId, hookId, apiEndpoint, eventsQuery, status, details) {
     this.queries.insertHook.run({
-      accessId, hookId, apiEndpoint, hookId,
+      triggerId, hookId, apiEndpoint, hookId,
       eventsQuery: JSON.stringify(eventsQuery), status,
       details: JSON.stringify(details)
     });
@@ -58,29 +58,29 @@ class StateStorageSqlite extends StateStorageInterface {
   /**
      * Update the detail value of the hook.
      * This implementation is optional
-     * @param {string} accessId
+     * @param {string} triggerId
      * @param {Object} details
      */
-  async updateHookDetail(accessId, details) {
-    this.queries.updateHookDetail.run({ accessId, details: JSON.stringify(details) });
+  async updateHookDetail(triggerId, details) {
+    this.queries.updateHookDetail.run({ triggerId, details: JSON.stringify(details) });
   }
 
   /**
    * Update last synch value for this hook
-   * @param {string} accessId 
+   * @param {string} triggerId 
    * @param {number} lastSync Time in seconds (in server time scope)
    */
-  async updateLastSync(accessId, lastSync) {
-    this.queries.updateLastSync.run({ accessId, lastSync });
+  async updateLastSync(triggerId, lastSync) {
+    this.queries.updateLastSync.run({ triggerId, lastSync });
   }
 
 
   /**
-   * @param {string} accessId
+   * @param {string} triggerId
    * @returns {Hook} 
    */
-  async hookForAccessId(accessId) {
-    let res = this.queries.getHookForAccessId.get({ accessId });
+  async hookFortriggerId(triggerId) {
+    let res = this.queries.getHookFortriggerId.get({ triggerId });
     res.eventsQuery = JSON.parse(res.eventsQuery);
     return res;
   }
@@ -88,8 +88,8 @@ class StateStorageSqlite extends StateStorageInterface {
   /**
    * @returns {Array<Hook>} 
    */
-  async allHooksAccessIds(accessId) {
-    return this.queries.allHooksAccessIds.all({});
+  async allHookstriggerIds(triggerId) {
+    return this.queries.allHookstriggerIds.all({});
   }
 
 }

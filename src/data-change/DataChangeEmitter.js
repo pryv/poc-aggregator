@@ -27,56 +27,56 @@ class DataChangeEmitter extends EventEmitter {
    * @function newHook
    * advertised on new Hook
    * - !! hook contains the credential to acces the account and might not be stored
-   * @param {string} accessId 
+   * @param {string} triggerId 
    * @param {Hook} hook 
    */
-  newHook(accessId, hook) {
-    this.emit(DataChangesNames.HOOK.NEW, accessId, hook);
+  newHook(triggerId, hook) {
+    this.emit(DataChangesNames.HOOK.NEW, triggerId, hook);
   }
 
   /**
    * @function deleteHook
    * advertised on a deleted Hook
    * - All data relative to this access should be deleted
-   * @param {string} accessId 
+   * @param {string} triggerId 
    */
-  deleteHook(accessId) {
-    this.emit(DataChangesNames.HOOK.DELETE, accessId);
+  deleteHook(triggerId) {
+    this.emit(DataChangesNames.HOOK.DELETE, triggerId);
   }
 
   /**
    * @function newOrUpdateEvent
    * advertised on new Event
    * - Event should be added or updated
-   * @param {string} accessId 
+   * @param {string} triggerId 
    * @param {Object} event // following Pryv.io's Event structure
    */
-  newOrUpdateEvent(accessId, event) {
-    this.emit(DataChangesNames.EVENT.NEW_OR_UPDATE, accessId, event);
+  newOrUpdateEvent(triggerId, event) {
+    this.emit(DataChangesNames.EVENT.NEW_OR_UPDATE, triggerId, event);
   }
 
   /**
    * @function deletedEvent
    * advertised on a deleted Event
    * - Event should be removed
-   * @param {string} accessId 
+   * @param {string} triggerId 
    * @param {Object} event
    * @param {string} event.id 
    * @param {number} [event.deleted] Deleted time. ! Might not be available
    */
-  deletedEvent(accessId, event) {
-    this.emit(DataChangesNames.EVENT.DELETE, accessId, event);
+  deletedEvent(triggerId, event) {
+    this.emit(DataChangesNames.EVENT.DELETE, triggerId, event);
   }
 
   /**
    * @function newStreams
    * advertised on a new Stream Structure
    * - List of streams should be updated
-   * @param {string} accessId 
+   * @param {string} triggerId 
    * @param {Object} streams
    */
-  newStreams(accessId, streams) {
-    this.emit(DataChangesNames.STREAMS.NEW_OR_UPDATE, accessId, streams);
+  newStreams(triggerId, streams) {
+    this.emit(DataChangesNames.STREAMS.NEW_OR_UPDATE, triggerId, streams);
   }
 }
 

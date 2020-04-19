@@ -23,7 +23,7 @@
     "hooks" : [
       {
         "apiEndpoint": "https://ck92fmba400lo1kd39fblby4m@testuser.pryv.me/",
-        "accessId": "ck92fmba500lp1kd3mbzyw52y"
+        "triggerId": "ck92fmba500lp1kd3mbzyw52y"
       }
     ]
   }
