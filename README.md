@@ -26,23 +26,63 @@ While Pryv.io is designed to store and manage data per-individual / per-consent,
 
 ## Install
 
-Requirements: 
+### Requirements: 
 
 	- Node.js 12+
 	- NPM 
 	- An option SSL reverse-proxy (exemple nginx) to secure trigger notices.
 
-Install:
+### Install:
 
 - run `npm setup`
 
-Configuration: 
+### Configuration: 
 
 - edit `config.json`
   - **server:** Server configuration
     - **port:** the port to listen
     - **host**: the interface to use. for all:  `0.0.0.0`, for localhost only: `127.0.0.1`
-  - **service**: Url to reach the aggregator service, if no SSL termination: **http://{hostname}:{port}/** 
+  - **service**: Url to reach the aggregator service, if no SSL termination: **http://{hostname}:{port}/**
+  - **state-storage**: Choose **one** stage storage to use, see stage storage bellow
+  - **data-listeners**: Array of **data listeners** to use, more informations bellow
+
+#### Configuration, State Storage
+
+A State storage holds the list of web hooks and their status, currently supported stage storage is SQLITE. 
+
+``` json
+ "state-storage": {
+    "module": "StateStorageSqlite",
+    "params": {
+      "dbfile": "./db-states.sqlite",
+      "log": false
+    }
+  }
+```
+
+To implement your own State Storage, look at `src/state-storage`
+
+#### Configuration, Data Listeners
+
+A Data Listener, register to data change and take actions, for example `DataListenerConsole`prints outs changes and `DataListenerSQLite` keeps streams and events data in a local database.
+
+```json
+"data-listeners": [
+    {
+      "module": "DataListenerConsole",
+      "params": {}
+    },
+    {
+      "module": "DataListenerSQLite",
+      "params": {
+        "dbfile": "./db-data.sqlite",
+        "log": false
+      }
+    }
+  ]
+```
+
+To implement your own Data Listener, look at `src/data-listeners`
 
 ## Run
 

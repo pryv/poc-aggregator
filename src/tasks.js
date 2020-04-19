@@ -129,7 +129,6 @@ async function getStreams(triggerId, conn, hook) {
 
 async function getEvents(triggerId, conn, hook) {
   const queryParams = {
-    limit: 5,
     fromTime: - Number.MAX_VALUE,
     setTime: Number.MAX_VALUE
   }
