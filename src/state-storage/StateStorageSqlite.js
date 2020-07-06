@@ -13,7 +13,7 @@ class StateStorageSqlite extends StateStorageInterface {
       'hookId TEXT UNIQUE, ' + // id of the Hook for Pryv.io
       'apiEndpoint TEXT, ' + // pryvApiEndpoint https://{token}@{path}
       'lastSync INTEGER DEFAULT -9223372036854775808, ' + // last synch time sent by API
-      'eventsQuery TEXT, ' + // JSON string for get.events Query
+      'eventsQuery TEXT, ' + // JSON string for get.events Query ?fromTime=0&toTime$=1000
       'status INTEGER, ' +  // 0 - OFF, 1 - ACTIVE , -1 - FAULTY
       'details TEXT )' // JSON string of last webHook update or create 
     ).run();

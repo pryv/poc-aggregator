@@ -11,7 +11,6 @@ const stateStorage = require('./state-storage/');
 const logger = require('./utils/logging.js');
 const port = config.get('server:port');
 
-app.get('/', (req, res) => res.send('Hello World!'));
 
 /**
  * Create a Hook
