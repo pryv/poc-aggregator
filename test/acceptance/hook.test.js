@@ -1,19 +1,18 @@
 /*global describe, it */
-const config = require('../../src/utils/config.js'),
-  request = require('superagent');
+const config = require('../../src/utils/config.js');
 const Pryv = require('pryv');
+const request = require('supertest');
 
 
 const should = require('should');
-const server = require('../../src/server');
-const e = require('express');
+const app = require('../../src/app.js');
 
 const serverBasePath = 'http://' + config.get('server:ip') + ':' + config.get('server:port');
 const testhook = config.get('test:hooks')[0];
 const testNewHook = config.get('test:hooks')[1];
 const nonAuthorizedHook = config.get('test:hooks')[2];
 
-describe('Hook', function () {
+describe('hooks', function () {
 
   // it('Create', function (done) {
   //   request.post(serverBasePath + '/hook')
@@ -88,12 +87,38 @@ describe('Hook', function () {
   //     });
   // });
 
+  describe('POST /', () => {
+
+    describe('when the webhook does not exist', () => {
+
+      let response;
+      before(async () => {
+        // do API call
+        response = await request(app)
+          .post(serverBasePath + '/hook')
+          .set('Accept', 'application/json')
+          .send({pryvApiEndpoint: testNewHook.apiEndpoint});
+      });
+      after(() => {
+        // delete webhook on Pryv.io
+        // cleanup DB here or at the beginning of file?
+      });
+
+      it('must return a valid response', () => {
+
+      });
+      it('must create a row in the local SQLite DB hooks table', () => {
+
+      });
+      it('must create a Pryv.io webhook', () => {
+
+      });
+    })
+  })
+
   it('Check that webhook was created', function(done){
     request.post(serverBasePath + '/hook')
     .set('Accept', 'application/json')
-      .set('Accept-Charset', 'utf-8')
-      .set('Accept-Encoding', 'gzip, deflate')
-      .set('Content-Type', 'application/json')
       .send({
         pryvApiEndpoint: testNewHook.apiEndpoint
       })
