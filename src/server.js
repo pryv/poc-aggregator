@@ -17,11 +17,15 @@ const port = config.get('server:port');
  */
 app.post('/hook', async (req, res) => {
   try {
-    if(!req.body.pryvApiEndpoint){
+    if(!req.body.pryvApiEndpoint && req.body.pryvApiEndpoint !== ""){
       res.status(400).send('Missing pryvApiEndpoint field');
+      
     }
-    const response = await hook.create(req.body.pryvApiEndpoint, {});
-    res.send(response)
+    else{
+      const response = await hook.create(req.body.pryvApiEndpoint, {});
+      res.send(response)
+    }
+    
   } catch (error) {
     logger.error('Error Creating hook: ', error);
     res.status(500).send('Something broke!');
