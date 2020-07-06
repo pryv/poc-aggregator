@@ -11,19 +11,6 @@ const testhook = config.get('test:hooks')[0];
 
 describe('Trigger', function () {
 
-  describe('When adding a new event', () => {
-
-    before(() => {
-      // create on Pryv.io API
-
-      // wait for notification
-    });
-
-    it('must fetch the new event', () => {
-      // See that data storage was updated in aggregator
-    })
-  })
-
   it('Create', function (done) {
     request.post(serverBasePath + '/trigger/' + testhook.triggerId)
       .set('Accept', 'application/json')

@@ -29,4 +29,24 @@ describe('Hook', function () {
       });
   });
 
+  // TODO
+  it('Check hook with invalid apiEndpoint', function(done){
+    request.post(serverBasePath + '/hook')
+    .set('Accept', 'application/json')
+      .set('Accept-Charset', 'utf-8')
+      .set('Accept-Encoding', 'gzip, deflate')
+      .set('Content-Type', 'application/json')
+      .send({
+        pryvApiEndpoint: '0'
+      })
+      .end(function (err, res) {
+        should.exist(res);
+        should.exist(res.error);
+        should.exist(res.error.text);
+        should.equal(res.error.text,'Something broke!');
+        res.status.should.equal(500);
+        done();
+      });
+  });
+
 });
