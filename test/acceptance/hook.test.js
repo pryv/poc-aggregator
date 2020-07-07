@@ -6,101 +6,41 @@ const app = require('../../src/app.js');
 const config = require('../../src/utils/config.js');
 const stateStorage = require('../../src/state-storage/');
 
-const testHook = config.get('test:hooks')[0];
+const userHook = config.get('test:hooks')[0];
+const wrongAddressHook = config.get('test:hooks')[1];
+const wrongTokenHook = config.get('test:hooks')[2];
 
 describe('hooks', function () {
-
-  // it('Create', function (done) {
-  //   request.post(serverBasePath + '/hook')
-  //     .set('Accept', 'application/json')
-  //     .set('Accept-Charset', 'utf-8')
-  //     .set('Accept-Encoding', 'gzip, deflate')
-  //     .set('Content-Type', 'application/json')
-  //     .send({
-  //       pryvApiEndpoint: testhook.apiEndpoint
-  //     })
-  //     .end(function (err, res) {
-  //       should.exist(res);
-  //       should.exist(res.body.result);
-  //       should.equal(res.body.result,'OK');
-  //       res.status.should.equal(200);
-  //       done();
-  //     });
-  // });
-
-  // it('Check hook with empty string apiEndpoint', function(done){
-  //   request.post(serverBasePath + '/hook')
-  //   .set('Accept', 'application/json')
-  //     .set('Accept-Charset', 'utf-8')
-  //     .set('Accept-Encoding', 'gzip, deflate')
-  //     .set('Content-Type', 'application/json')
-  //     .send({
-  //       pryvApiEndpoint: ''
-  //     })
-  //     .end(function (err, res) {
-  //       should.exist(res);
-  //       should.exist(res.error);
-  //       should.exist(res.error.text);
-  //       should.equal(res.error.text,'Something broke!');
-  //       res.status.should.equal(500);
-  //       done();
-  //     });
-  // });
-
-  // it('Check hook with no apiEndpoint', function(done){
-  //   request.post(serverBasePath + '/hook')
-  //   .set('Accept', 'application/json')
-  //     .set('Accept-Charset', 'utf-8')
-  //     .set('Accept-Encoding', 'gzip, deflate')
-  //     .set('Content-Type', 'application/json')
-  //     .send()
-  //     .end(function (err, res) {
-  //       should.exist(res);
-  //       should.exist(res.error);
-  //       should.exist(res.error.text);
-  //       should.equal(res.error.text,'Missing pryvApiEndpoint field');
-  //       res.status.should.equal(400);
-  //       done();
-  //     });
-  // });
-
-  // it('Check hook with non authorized apiEndpoint', function(done){
-  //   request.post(serverBasePath + '/hook')
-  //   .set('Accept', 'application/json')
-  //     .set('Accept-Charset', 'utf-8')
-  //     .set('Accept-Encoding', 'gzip, deflate')
-  //     .set('Content-Type', 'application/json')
-  //     .send({
-  //       pryvApiEndpoint: nonAuthorizedHook.apiEndpoint
-  //     })
-  //     .end(function (err, res) {
-  //       should.exist(res);
-  //       should.exist(res.error);
-  //       should.exist(res.error.text);
-  //       should.equal(res.error.text,'Something broke!');
-  //       res.status.should.equal(500);
-  //       done();
-  //     });
-  // });
 
   describe('POST /', () => {
     describe('when the webhook does not exist', () => {
       let response;
+      let triggerId;
       
       before(async () => {
         // do API call
         response = await request(app)
           .post('/hook')
           .set('Accept', 'application/json')
-          .send({pryvApiEndpoint: testHook.apiEndpoint});
+          .send({pryvApiEndpoint: userHook.apiEndpoint});
+        triggerId = response.body.triggerId;
       });
 
       after(async () => {
-        // delete webhook on Pryv.io
-        const id = response.body.webhook.id;
-        await request(testHook.apiEndpoint).delete('webhooks/'+ id).send();
-        // cleanup DB
-        stateStorage.deleteHook(response.body.triggerId);
+        setTimeout(async () => {
+          const id = response.body.webhook.id;
+          // delete webhook on Pryv.io
+          await request(userHook.apiEndpoint).delete('webhooks/'+ id).send();
+          // cleanup DB
+          stateStorage.deleteHook(response.body.triggerId);
+        },400);
+       
+       
+        // const id = response.body.webhook.id;
+        // // delete webhook on Pryv.io
+        // await request(userHook.apiEndpoint).delete('webhooks/'+ id).send();
+        // // cleanup DB
+        // stateStorage.deleteHook(response.body.triggerId);
       });
 
       it('must return a valid response', () => {
@@ -116,11 +56,10 @@ describe('hooks', function () {
       });
 
       it('must create a row in the local SQLite DB hooks table', () => {
-        const triggerId = response.body.triggerId;
         should.exist(stateStorage.hookFortriggerId(triggerId));
         stateStorage.hookFortriggerId(triggerId).then((hook) => {
           should.exist(hook.apiEndpoint);
-          should.equal(hook.apiEndpoint, testHook.apiEndpoint);
+          should.equal(hook.apiEndpoint, userHook.apiEndpoint);
           should.exist(hook.hookId);
           should.equal(hook.hookId, response.body.webhook.id);
         });
@@ -128,7 +67,7 @@ describe('hooks', function () {
       
       it('must create a Pryv.io webhook', async () => {
         const id = response.body.webhook.id;
-        const pryvHookResponse = await request(testHook.apiEndpoint)
+        const pryvHookResponse = await request(userHook.apiEndpoint)
           .get('webhooks/' + id)
           .set('Accept', 'application/json')
           .send();
@@ -151,11 +90,11 @@ describe('hooks', function () {
         let hookCreateResponse = await request(app)
           .post('/hook')
           .set('Accept', 'application/json')
-          .send({pryvApiEndpoint: testHook.apiEndpoint});
+          .send({pryvApiEndpoint: userHook.apiEndpoint});
 
         // do API call to get the hook on Pryv.io
         const id = hookCreateResponse.body.webhook.id;
-        pryvHookResponse = await request(testHook.apiEndpoint)
+        pryvHookResponse = await request(userHook.apiEndpoint)
           .get('webhooks/' + id)
           .set('Accept', 'application/json')
           .send();
@@ -169,15 +108,24 @@ describe('hooks', function () {
         response = await request(app)
         .post('/hook')
         .set('Accept', 'application/json')
-        .send({pryvApiEndpoint: testHook.apiEndpoint});
+        .send({pryvApiEndpoint: userHook.apiEndpoint});
       });
 
       after(async () => {
-        // delete webhook on Pryv.io
-        const id = response.body.webhook.id;
-        await request(testHook.apiEndpoint).delete('webhooks/'+ id).send();
-        // cleanup DB
-        stateStorage.deleteHook(response.body.triggerId);
+        setTimeout(async () => {
+          const id = response.body.webhook.id;
+          // delete webhook on Pryv.io
+          await request(userHook.apiEndpoint).delete('webhooks/'+ id).send();
+          // cleanup DB
+          stateStorage.deleteHook(response.body.triggerId);
+        },900);
+       
+       
+        // const id = response.body.webhook.id;
+        // // delete webhook on Pryv.io
+        // await request(userHook.apiEndpoint).delete('webhooks/'+ id).send();
+        // // cleanup DB
+        // stateStorage.deleteHook(response.body.triggerId);
       });
 
       it('must return a valid response', () => {
@@ -195,7 +143,7 @@ describe('hooks', function () {
         const triggerId = response.body.triggerId;
         stateStorage.allHookstriggerIds().then((triggerIds) => {
           should.exist(triggerIds);
-          should.deepEqual(triggerIds, triggerIdsTable);
+          should.equal(triggerIds.length, triggerIdsTable.length);
         });
         stateStorage.hookFortriggerId(triggerId).then((hook) => {
           should.exist(hook);
@@ -205,7 +153,7 @@ describe('hooks', function () {
 
       it('must the hook on Pryv.io be unchanged', async () => {
         const id = response.body.webhook.id;
-        const pryvHookResponseAfterSecondCall = await request(testHook.apiEndpoint)
+        const pryvHookResponseAfterSecondCall = await request(userHook.apiEndpoint)
           .get('webhooks/' + id)
           .set('Accept', 'application/json')
           .send();
@@ -216,6 +164,112 @@ describe('hooks', function () {
         should.deepEqual(pryvHookResponseAfterSecondCall.body.webhook, pryvHookResponse.body.webhook);
       });
     });
-  })
 
+    describe('when the apiEndpoint is incorrect', () => {
+      describe('when the apiEndpoint is the empty string', () => {
+        let response;
+        let oldDB;
+
+        before(async () => {
+          response = await request(app)
+            .post('/hook')
+            .set('Accept', 'application/json')
+            .send({pryvApiEndpoint: ""});
+          stateStorage.allHookstriggerIds().then((triggerIds) => oldDB = triggerIds);
+        });
+
+        it('must return a valid response', () => {
+          should.exist(response);
+          should.exist(response.status);
+          should.equal(response.status, 400);
+          should.exist(response.text);
+          should.equal(response.text, "Cannot find endpoint, invalid pryvApiEndpoint");
+        });
+
+        it('must the local SQLite DB hooks table be unchanged', async () => {
+          stateStorage.allHookstriggerIds().then((triggerIds) => should.deepEqual(triggerIds,oldDB));
+        });
+      });
+
+      describe('when the apiEndpoint is not provided', () => {
+        let response;
+        let oldDB;
+
+        before(async () => {
+          response = await request(app)
+            .post('/hook')
+            .set('Accept', 'application/json')
+            .send({});
+          stateStorage.allHookstriggerIds().then((triggerIds) => oldDB = triggerIds);
+        });
+
+        it('must return a valid response', () => {
+          should.exist(response);
+          should.exist(response.status);
+          should.equal(response.status, 400);
+          should.exist(response.text);
+          should.equal(response.text, "Missing pryvApiEndpoint field");
+        });
+
+        it('must the local SQLite DB hooks table be unchanged', async () => {
+          stateStorage.allHookstriggerIds().then((triggerIds) => should.deepEqual(triggerIds,oldDB));
+        });
+
+      });
+
+      describe('when the apiEndpoint is not valid', () => {
+        let response;
+        let oldDB;
+
+        before(async () => {
+          response = await request(app)
+            .post('/hook')
+            .set('Accept', 'application/json')
+            .send({pryvApiEndpoint: wrongAddressHook.apiEndpoint});
+          stateStorage.allHookstriggerIds().then((triggerIds) => oldDB = triggerIds);
+        });
+
+        it('must return a valid response', () => {
+          should.exist(response);
+          should.exist(response.status);
+          should.equal(response.status, 400);
+          should.exist(response.text);
+          should.equal(response.text, "Cannot find endpoint, invalid pryvApiEndpoint");
+        });
+
+        it('must the local SQLite DB hooks table be unchanged', async () => {
+          stateStorage.allHookstriggerIds().then((triggerIds) => should.deepEqual(triggerIds,oldDB));
+        });
+
+      });
+
+      describe('when the access token is not valid', () => {
+        let response;
+        let oldDB;
+
+        before(async () => {
+          response = await request(app)
+            .post('/hook')
+            .set('Accept', 'application/json')
+            .send({pryvApiEndpoint: wrongTokenHook.apiEndpoint});
+          stateStorage.allHookstriggerIds().then((triggerIds) => oldDB = triggerIds);
+        });
+
+        it('must return a valid response', () => {
+          should.exist(response);
+          should.exist(response.status);
+          should.equal(response.status, 400);
+          should.exist(response.text);
+          console.log(response.text);
+          should.equal(response.text, "Access token not valid");
+        });
+
+        it('must the local SQLite DB hooks table be unchanged', async () => {
+          stateStorage.allHookstriggerIds().then((triggerIds) => should.deepEqual(triggerIds,oldDB));
+        });
+
+      });
+
+    });
+  });
 });

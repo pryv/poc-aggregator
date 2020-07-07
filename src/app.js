@@ -8,6 +8,7 @@ const hook = require('./hook.js');
  */
 const stateStorage = require('./state-storage/index.js');
 const logger = require('./utils/logging.js');
+const { key } = require('nconf');
 
 
 /**
@@ -26,7 +27,22 @@ app.post('/hook', async (req, res) => {
     
   } catch (error) {
     logger.error('Error Creating hook: ', error);
-    res.status(500).send('Something broke!');
+
+    if(error.message == "Cannot find endpoint, invalid URL format"){
+      res.status(400).send("Cannot find endpoint, invalid pryvApiEndpoint");
+    }
+    else if(error.message.includes('getaddrinfo')){
+      // DNS cannot find the corresponding IP address
+      res.status(400).send("Cannot find endpoint, invalid pryvApiEndpoint");
+    }
+    else if(error.message.includes('Forbidden')){
+      // Pryv.io returns a Forbidden due to an incorrect token
+      res.status(400).send("Access token not valid");
+    }
+    else{
+      res.status(500).send('Something broke!'); 
+    }
+    
   }
 });
 

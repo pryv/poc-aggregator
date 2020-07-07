@@ -53,7 +53,6 @@ exports.create = async function (pryvApiEndpoint, eventsQuery) {
   if (!webhookDetails || !webhookDetails.id ) { 
     throw new Error('Failed creating WebHook');
   }
-
   stateStorage.addHook(
     triggerId, webhookDetails.id, pryvApiEndpoint, 
     eventsQuery, stateStorage.status.ACTIVE, webhookDetails);
