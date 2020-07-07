@@ -28,6 +28,15 @@ class StateStorageInterface {
   }
 
   /**
+   * Delete an Hook per triggerId
+   * This implementation is optional
+   * @param {string} triggerId 
+   */
+  async deleteHook(triggerId){
+    // Optional
+  }
+
+  /**
    * Update the detail value of the hook.
    * This implementation is optional
    * @param {string} triggerId 

@@ -1,16 +1,13 @@
 /*global describe, it */
-const config = require('../../src/utils/config.js');
 const Pryv = require('pryv');
 const request = require('supertest');
-
-
 const should = require('should');
-const app = require('../../src/app.js');
 
-const serverBasePath = 'http://' + config.get('server:ip') + ':' + config.get('server:port');
-const testhook = config.get('test:hooks')[0];
-const testNewHook = config.get('test:hooks')[1];
-const nonAuthorizedHook = config.get('test:hooks')[2];
+const app = require('../../src/app.js');
+const config = require('../../src/utils/config.js');
+const stateStorage = require('../../src/state-storage/');
+
+const testHook = config.get('test:hooks')[0];
 
 describe('hooks', function () {
 
@@ -88,95 +85,128 @@ describe('hooks', function () {
   // });
 
   describe('POST /', () => {
-
     describe('when the webhook does not exist', () => {
-
       let response;
+      
       before(async () => {
         // do API call
         response = await request(app)
-          .post(serverBasePath + '/hook')
+          .post('/hook')
           .set('Accept', 'application/json')
-          .send({pryvApiEndpoint: testNewHook.apiEndpoint});
+          .send({pryvApiEndpoint: testHook.apiEndpoint});
       });
-      after(() => {
+
+      after(async () => {
         // delete webhook on Pryv.io
-        // cleanup DB here or at the beginning of file?
+        const id = response.body.webhook.id;
+        await request(testHook.apiEndpoint).delete('webhooks/'+ id).send();
+        // cleanup DB
+        stateStorage.deleteHook(response.body.triggerId);
       });
 
       it('must return a valid response', () => {
-
+        should.exist(response);
+        should.exist(response.status);
+        should.equal(response.status, 200);
+        should.exist(response.body);
+        should.exist(response.body.result);
+        should.equal(response.body.result, 'OK');
+        should.exist(response.body.actionMsg);
+        should.equal(response.body.actionMsg, 'CREATED');
+        should.exist(response.body.webhook);
       });
+
       it('must create a row in the local SQLite DB hooks table', () => {
-
+        const triggerId = response.body.triggerId;
+        should.exist(stateStorage.hookFortriggerId(triggerId));
+        stateStorage.hookFortriggerId(triggerId).then((hook) => {
+          should.exist(hook.apiEndpoint);
+          should.equal(hook.apiEndpoint, testHook.apiEndpoint);
+          should.exist(hook.hookId);
+          should.equal(hook.hookId, response.body.webhook.id);
+        });
       });
-      it('must create a Pryv.io webhook', () => {
-
+      
+      it('must create a Pryv.io webhook', async () => {
+        const id = response.body.webhook.id;
+        const pryvHookResponse = await request(testHook.apiEndpoint)
+          .get('webhooks/' + id)
+          .set('Accept', 'application/json')
+          .send();
+        should.exist(pryvHookResponse);
+        should.exist(pryvHookResponse.status);
+        should.equal(pryvHookResponse.status, 200);
+        should.exist(pryvHookResponse.body.webhook);
+        should.deepEqual(pryvHookResponse.body.webhook,response.body.webhook);
       });
-    })
+    });
+
+    describe('when the webhook exists already', () => {
+
+    });
   })
 
-  it('Check that webhook was created', function(done){
-    request.post(serverBasePath + '/hook')
-    .set('Accept', 'application/json')
-      .send({
-        pryvApiEndpoint: testNewHook.apiEndpoint
-      })
-      .end(async function (err, res) {
-        // Receive Result of the creation of the new hook
-        should.exist(res);
-        should.exist(res.body.triggerId);
-        should.equal(res.body.result,'OK');
-        res.status.should.equal(200);
+  // it('Check that webhook was created', function(done){
+  //   request.post(serverBasePath + '/hook')
+  //   .set('Accept', 'application/json')
+  //     .send({
+  //       pryvApiEndpoint: testNewHook.apiEndpoint
+  //     })
+  //     .end(async function (err, res) {
+  //       // Receive Result of the creation of the new hook
+  //       should.exist(res);
+  //       should.exist(res.body.triggerId);
+  //       should.equal(res.body.result,'OK');
+  //       res.status.should.equal(200);
 
-        // Create a connection to Pryv to check if the hook was created.
-        const conn = new Pryv.Connection(testNewHook.apiEndpoint);
-        const webhooksResult = await conn.get('webhooks');
-        const accessInfo = await conn.get('access-info');
-        const accessId = res.body.webhook.accessId;
-        check = false;
+  //       // Create a connection to Pryv to check if the hook was created.
+  //       const conn = new Pryv.Connection(testNewHook.apiEndpoint);
+  //       const webhooksResult = await conn.get('webhooks');
+  //       const accessInfo = await conn.get('access-info');
+  //       const accessId = res.body.webhook.accessId;
+  //       check = false;
 
-        // Check if the new hook is in the list of hooks.
-        if (webhooksResult.webhooks) {
-          webhooksResult.webhooks.forEach((webhook) => { 
-            if (webhook.accessId === accessId) {
-              check = true;
-            }
-          });
-        }
-        should.equal(check,true);
+  //       // Check if the new hook is in the list of hooks.
+  //       if (webhooksResult.webhooks) {
+  //         webhooksResult.webhooks.forEach((webhook) => { 
+  //           if (webhook.accessId === accessId) {
+  //             check = true;
+  //           }
+  //         });
+  //       }
+  //       should.equal(check,true);
 
-        done();
-      });
-  });
+  //       done();
+  //     });
+  // });
   
-  it('If webhook exists, not create a new one', function(done){
-    retrieveHook(testNewHook.apiEndpoint).then(function (tmpWebhook){
-      request.post(serverBasePath + '/hook')
-      .set('Accept', 'application/json')
-      .set('Accept-Charset', 'utf-8')
-      .set('Accept-Encoding', 'gzip, deflate')
-      .set('Content-Type', 'application/json')
-      .send({
-        pryvApiEndpoint: testNewHook.apiEndpoint
-      })
-      .end(function (err, res) {
-        should.exist(res);
-        should.exist(res.body.actionMsg);
-        should.equal(res.body.actionMsg,'ALREADY_EXISTS');
-        res.status.should.equal(200);
-        should.deepEqual(res.body.webhook,tmpWebhook);
-        done();
-      });
-    })
+  // it('If webhook exists, not create a new one', function(done){
+  //   retrieveHook(testNewHook.apiEndpoint).then(function (tmpWebhook){
+  //     request.post(serverBasePath + '/hook')
+  //     .set('Accept', 'application/json')
+  //     .set('Accept-Charset', 'utf-8')
+  //     .set('Accept-Encoding', 'gzip, deflate')
+  //     .set('Content-Type', 'application/json')
+  //     .send({
+  //       pryvApiEndpoint: testNewHook.apiEndpoint
+  //     })
+  //     .end(function (err, res) {
+  //       should.exist(res);
+  //       should.exist(res.body.actionMsg);
+  //       should.equal(res.body.actionMsg,'ALREADY_EXISTS');
+  //       res.status.should.equal(200);
+  //       should.deepEqual(res.body.webhook,tmpWebhook);
+  //       done();
+  //     });
+  //   })
     
       
-  });
+  // });
 
-  retrieveHook = async function(apiEndpoint){
-    const conn = new Pryv.Connection(testNewHook.apiEndpoint);
-    const webhooksResult = await conn.get('webhooks');
-    return webhooksResult.webhooks[0];
-  }
+  // retrieveHook = async function(apiEndpoint){
+  //   const conn = new Pryv.Connection(testNewHook.apiEndpoint);
+  //   const webhooksResult = await conn.get('webhooks');
+  //   return webhooksResult.webhooks[0];
+  // }
 
 });

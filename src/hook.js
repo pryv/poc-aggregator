@@ -42,11 +42,11 @@ exports.create = async function (pryvApiEndpoint, eventsQuery) {
   }
 
   // if not found create it
-  if (! webhookDetails) {
+  if (!webhookDetails) {
     triggerId = cuid();
     const triggerUrl = baseTriggerUrl + accessInfo.id;
     const result = await conn.post('webhooks', { url: triggerUrl });
-    webhookDetails = result.webHook;
+    webhookDetails = result.webhook;
     actionMsg = 'CREATED';
   }
 

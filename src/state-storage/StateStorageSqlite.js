@@ -28,6 +28,7 @@ class StateStorageSqlite extends StateStorageInterface {
       insertHook: db.prepare('INSERT OR REPLACE INTO hooks ' +
         '(triggerId, hookId, apiEndpoint, eventsQuery, status, details) VALUES ' +
         '(@triggerId, @hookId, @apiEndpoint, @eventsQuery, @status, @details)'),
+      deleteHook: db.prepare('DELETE FROM hooks WHERE triggerId = @triggerId'),
       updateHookDetail: db.prepare(
         'UPDATE hooks SET details = @details WHERE triggerId = @triggerId'),
       updateLastSync: db.prepare(
@@ -54,6 +55,13 @@ class StateStorageSqlite extends StateStorageInterface {
       details: JSON.stringify(details)
     });
   };
+
+  /**
+   * @param {string} triggerId 
+   */
+  async deleteHook(triggerId){
+    this.queries.deleteHook.run({triggerId});
+  }
 
   /**
      * Update the detail value of the hook.

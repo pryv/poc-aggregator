@@ -1,7 +1,7 @@
 {
   "server": {
     "port" : 8080,
-    "ip": "0.0.0.0"
+    "ip": "127.0.0.1"
   },
   "service": {
     "baseUrl": "http://kertiroz.asuscomm.com:8080/"
@@ -32,14 +32,6 @@
       {
         "apiEndpoint": "https://ck92fmba400lo1kd39fblby4m@testuser.pryv.me/",
         "triggerId": "ck92fmba500lp1kd3mbzyw52y"
-      },
-      {
-        "apiEndpoint": "https://ckcaeyd7303wy1ld3m29xxoxu@adeleze.pryv.me/",
-        "triggerId": "0"
-      },
-      {
-        "apiEndpoint": "https://ckcaeyd7303wy1ld3m29hello@testuser.pryv.me/",
-        "triggerId": "0"
       }
     ]
   }

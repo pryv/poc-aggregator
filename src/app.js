@@ -1,5 +1,4 @@
 const express = require('express');
-const config = require('./utils/config.js');
 const app = express();
 app.use(require('body-parser').json());
 
@@ -9,7 +8,6 @@ const hook = require('./hook.js');
  */
 const stateStorage = require('./state-storage/index.js');
 const logger = require('./utils/logging.js');
-const port = config.get('server:port');
 
 
 /**
