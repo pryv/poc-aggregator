@@ -3,6 +3,10 @@
     "port" : 8080,
     "ip": "127.0.0.1"
   },
+  "testServer": {
+    "port" : 8081,
+    "ip" : "127.0.0.1"
+  },
   "service": {
     "baseUrl": "http://kertiroz.asuscomm.com:8080/"
   },
@@ -30,17 +34,195 @@
   "test": {
     "hooks" : [
       {
-        "apiEndpoint": "https://ck92fmba400lo1kd39fblby4m@testuser.pryv.me/",
+        "apiEndpoint": "https://ckcd0m6sd076w1vd387afx5kf@aggregatorpryv.pryv.me/",
         "triggerId": "ck92fmba500lp1kd3mbzyw52y"
       },
       {
-        "apiEndpoint": "https://ck92fmba400lo1kd39fblby4m@fakeUser.pryv.me/",
+        "apiEndpoint": "https://ckcd0m6sd076w1vd387afx5kf@fakeUser.pryv.me/",
         "triggerId": "ck92fmba500lp1kd3mbzyw52y"
       },
       {
-        "apiEndpoint": "https://0000000000000000000000000@testuser.pryv.me/",
+        "apiEndpoint": "https://0000000000000000000000000@aggregatorpryv.pryv.me/",
+        "triggerId": "0000000000000000000000000"
+      },
+      {
+        "apiEndpoint": "http://0000000000000000000000000@127.0.0.1:8081/",
         "triggerId": "0000000000000000000000000"
       }
+    ],
+    
+    "trigger" : {
+      "messages": [
+        
+        "streamsChanged"
+      ],
+      "meta": {
+        "apiVersion": "1.4.11",
+        "serial": "20190802",
+        "serverTime": 1586845324.691
+      }
+    }
+  },
+  "mockServer" : {
+    "access-info" : {
+      "meta": {
+        "apiVersion": "1.5.17",
+        "serverTime": 1594207481.925,
+        "serial": "2019061301"
+      },
+      "type": "app",
+      "name": "app-web-access-test",
+      "permissions": [
+        {
+          "streamId": "*",
+          "level": "manage"
+        }
+      ],
+      "id": "ckcd0m6sd076x1vd3y6ylh4qr",
+      "token": "ckcd0m6sd076w1vd387afx5kf",
+      "lastUsed": 1594207447.242,
+      "clientData": {
+        "app-web-auth:description": {
+          "type": "note/txt",
+          "content": "This is a consent message."
+        }
+      },
+      "created": 1594191765.469,
+      "createdBy": "ckcd0m4y3076v1vd3iucd1a9w",
+      "modified": 1594191765.469,
+      "modifiedBy": "ckcd0m4y3076v1vd3iucd1a9w",
+      "calls": {
+        "getAccessInfo": 213,
+        "webhooks:get": 223,
+        "webhooks:create": 74,
+        "webhooks:getOne": 180,
+        "webhooks:delete": 74,
+        "callBatch": 133,
+        "streams:get": 147,
+        "events:get": 134,
+        "streams:create": 37,
+        "streams:delete": 67
+      }
+    },
+    
+    "listWebhooks" : {
+      "meta": {
+        "apiVersion": "1.5.17",
+        "serverTime": 1594208146.108,
+        "serial": "2019061301"
+      },
+      "webhooks": [
+        {
+          "id": "ckcdad5yf078f1vd38lleuk1c",
+          "accessId": "ckcd0m6sd076x1vd3y6ylh4qr",
+          "url": "http://kertiroz.asuscomm.com:8080",
+          "state": "active",
+          "runCount": 0,
+          "failCount": 0,
+          "lastRun": {
+            "status": 0,
+            "timestamp": 0
+          },
+          "runs": [],
+          "currentRetries": 0,
+          "maxRetries": 5,
+          "minIntervalMs": 5000,
+          "created": 1594208140.647,
+          "createdBy": "ckcd0m6sd076x1vd3y6ylh4qr",
+          "modified": 1594208140.647,
+          "modifiedBy": "ckcd0m6sd076x1vd3y6ylh4qr"
+        }
+      ]
+    },
+    
+    "activateHook" : {
+      "meta": {
+        "apiVersion": "1.5.17",
+        "serverTime": 1594276420.782,
+        "serial": "2019061301"
+      },
+      "results": [
+        {
+          "webhook": {
+            "id": "ck92g505000m81fd3flsxgwdb",
+            "accessId": "ckcd0m6sd076x1vd3y6ylh4qr",
+            "url": "http://kertiroz.asuscomm.com:8080",
+            "state": "active",
+            "runCount": 0,
+            "failCount": 0,
+            "lastRun": {
+              "status": 0,
+              "timestamp": 0
+            },
+            "runs": [],
+            "currentRetries": 0,
+            "maxRetries": 5,
+            "minIntervalMs": 5000,
+            "created": 1594208140.647,
+            "createdBy": "ckcd0m6sd076x1vd3y6ylh4qr",
+            "modified": 1594276420.776,
+            "modifiedBy": "ckcd0m6sd076x1vd3y6ylh4qr"
+          }
+        }
+      ]
+    },
+    
+    "events" : {
+      "events": [
+        {
+          "streamIds": [
+            "diary"
+          ],
+          "type": "pryv/test",
+          "time": 1594279485.851,
+          "tags": [],
+          "created": 1594279485.851,
+          "createdBy": "ckcd0m6sd076x1vd3y6ylh4qr",
+          "modified": 1594279485.851,
+          "modifiedBy": "ckcd0m6sd076x1vd3y6ylh4qr",
+          "id": "ckceguc9n07ah1vd344fwz21g",
+          "streamId": "diary",
+          "content": "test new event"
+        }
+      ],
+      "meta": {
+        "apiVersion": "1.5.17",
+        "serverTime": 1594284160.555,
+        "serial": "2019061301"
+      }
+    },
+    
+    "streams" : [
+      {
+        "meta": {
+          "apiVersion": "1.5.17",
+          "serverTime": 1594277259.933,
+          "serial": "2019061301"
+        },
+        "streams": [
+          {
+            "name": "Diary",
+            "parentId": null,
+            "created": 1594191615.63,
+            "createdBy": "ckcd0iz1i04351ld3qzrgz7u6",
+            "modified": 1594191615.63,
+            "modifiedBy": "ckcd0iz1i04351ld3qzrgz7u6",
+            "id": "diary",
+            "children": []
+          },
+          {
+            "name": "Diary2",
+            "parentId": null,
+            "created": 1594191615.64,
+            "createdBy": "ckcd0iz1i04351ld3qzrgz7u6",
+            "modified": 1594191615.64,
+            "modifiedBy": "ckcd0iz1i04351ld3qzrgz7u6",
+            "id": "diary2",
+            "children": []
+          }
+        ]
+      }
     ]
+    
   }
 }

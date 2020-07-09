@@ -4,7 +4,7 @@ const logger = require('../utils/logging');
 const { DataChangesNames, DataChangesListenersInterface } = require('./DataChangesDefinitions');
 
 function log(triggerId, call, msg) {
-  //logger.info('Listener [' + triggerId + '] - ' + call + ' > ' + msg);
+  logger.info('Listener [' + triggerId + '] - ' + call + ' > ' + msg);
 }
 
 

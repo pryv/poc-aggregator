@@ -10,7 +10,7 @@ const userHook = config.get('test:hooks')[0];
 const wrongAddressHook = config.get('test:hooks')[1];
 const wrongTokenHook = config.get('test:hooks')[2];
 
-describe('hooks', function () {
+describe('hooks', () => {
 
   describe('POST /', () => {
     describe('when the webhook does not exist', () => {
@@ -260,7 +260,6 @@ describe('hooks', function () {
           should.exist(response.status);
           should.equal(response.status, 400);
           should.exist(response.text);
-          console.log(response.text);
           should.equal(response.text, "Access token not valid");
         });
 

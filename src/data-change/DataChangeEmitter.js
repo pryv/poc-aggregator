@@ -26,7 +26,7 @@ class DataChangeEmitter extends EventEmitter {
   /**
    * @function newHook
    * advertised on new Hook
-   * - !! hook contains the credential to acces the account and might not be stored
+   * - !! hook contains the credential to access the account and might not be stored
    * @param {string} triggerId 
    * @param {Object} data
    * @param {string} data.pryvApiEndpoint

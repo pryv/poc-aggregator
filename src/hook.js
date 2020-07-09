@@ -68,7 +68,6 @@ exports.create = async function (pryvApiEndpoint, eventsQuery) {
  * 
  */
 exports.handleTrigger = async function (triggerId, triggerData) {
-  
   if (! triggerData || ! triggerData.messages) {
     throw Error('Invalid or missing trigger messages');
   }

@@ -75,7 +75,6 @@ async function next() {
     throw new Error('Integrity Error ');
   }
   delete tasks[triggerId]; 
-
   // set a next action in xx ms 
   setTimeout(async function () {
     await doTask(triggerId, taskSet);
@@ -93,6 +92,7 @@ async function doTask(triggerId, taskSet) {
     logger.error('Cannot find hook for triggerId: ' + triggerId);
     return; 
   }
+
   // get connextion
   const conn = new Pryv.Connection(hook.apiEndpoint);
   
