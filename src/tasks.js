@@ -95,7 +95,6 @@ async function doTask(triggerId, taskSet) {
 
   // get connextion
   const conn = new Pryv.Connection(hook.apiEndpoint);
-  
   for (let change of taskSet) {
     switch (change) {
       case Changes.ACTIVATE:

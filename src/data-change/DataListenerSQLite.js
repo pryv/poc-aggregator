@@ -47,8 +47,14 @@ class DataListenerConsole extends DataChangesListenersInterface { 
         '(@triggerId, @eventId, @eventData)'),
       deleteEvent: db.prepare(
         'DELETE FROM events WHERE triggerId = @triggerId AND eventId = @eventId'),
+      deleteAllEvents : db.prepare(
+        'DELETE FROM events WHERE triggerId = @triggerId'),
       newOrUpdateStreams: db.prepare(
-        'INSERT OR REPLACE INTO streams (triggerId, streamsData) VALUES (@triggerId, @streamsData)')
+        'INSERT OR REPLACE INTO streams (triggerId, streamsData) VALUES (@triggerId, @streamsData)'),
+      selectAllStreams : db.prepare(
+        'SELECT streamsData FROM streams WHERE triggerId = @triggerId'),
+      deleteStreams : db.prepare(
+        'DELETE FROM streams WHERE triggerId = @triggerId'),
     }
 
     // --------------- Register Event Listener 
@@ -104,7 +110,17 @@ class DataListenerConsole extends DataChangesListenersInterface { 
    * @param {Object} event
    */
   deleteEvent(triggerId, event) {
+    /*
+    *
+    *
+    * PROBLEM HERE with eventId
+    * 
+    */
     this.queries.deleteEvent.run({triggerId, eventId: eventId});
+  }
+
+  deleteAllEvents(triggerId){
+    this.queries.deleteAllEvents.run({triggerId});
   }
 
   /**
@@ -116,6 +132,14 @@ class DataListenerConsole extends DataChangesListenersInterface { 
    */
   newOrUpdateStreams(triggerId, streams) {
    this.queries.newOrUpdateStreams.run({triggerId, streamsData: JSON.stringify(streams)});
+  }
+
+  selectAllStreams(triggerId){
+    return this.queries.selectAllStreams.get({triggerId});
+  }
+
+  deleteStreams(triggerId){
+    this.queries.deleteStreams.run({triggerId});
   }
 
 }
