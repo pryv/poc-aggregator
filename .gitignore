@@ -1,3 +1,4 @@
 node_modules
 logfile.log
 /*.sqlite
+**/.DS_Store
