@@ -17,7 +17,8 @@ const testServerHook = config.get('test:hooks')[3];
 const newStream = config.get('mockServer:streams')[0];
 const updateStream = config.get('mockServer:streams')[1];
 
-const triggerOrder = config.get('test:trigger');
+const streamsChangedTrigger = config.get('test:triggers')[0];
+const eventsChangedTrigger = config.get('test:triggers')[1];
 
 const port = config.get('testServer:port');
 const ip = config.get('testServer:ip');
@@ -50,7 +51,7 @@ describe('trigger', () =>{
         responseTrigger = await request(app)
         .post('/trigger/' + triggerId)
         .set('Accept', 'application/json')
-        .send(triggerOrder);
+        .send(streamsChangedTrigger);
         
       });
       
@@ -101,6 +102,7 @@ describe('trigger', () =>{
     describe('when update a stream', () => {
       let responseHooks;
       let responseTrigger;
+      let oldStreams;
       
       before((done) => {
         streamAction = "update";
@@ -117,7 +119,7 @@ describe('trigger', () =>{
         responseTrigger = await request(app)
         .post('/trigger/' + triggerId)
         .set('Accept', 'application/json')
-        .send(triggerOrder);
+        .send(streamsChangedTrigger);
         
       });
       
@@ -155,15 +157,85 @@ describe('trigger', () =>{
         should.equal(responseTrigger.status, 200);
       });
       
-      it('must add the new streams in the DB', () => {
+      it('must update streams in the DB', () => {
         setTimeout(() => {
           should.exist(dataStorage.selectAllStreams(triggerId));
           should.exist(dataStorage.selectAllStreams(triggerId)['streamsData']);
           should.equal(dataStorage.selectAllStreams(triggerId)['streamsData'], JSON.stringify(updateStream.streams));
-        }, 800)
+        }, 800);
         
-      })
+      });
+
     });
+
+    // describe('when adding a new event', () => {
+    //   let responseHooks;
+    //   let responseTrigger;
+      
+    //   before((done) => {
+    //     streamAction = null;
+    //     runMockServer(done);
+    //   });
+      
+    //   before(async () => {
+    //     responseHooks = await request(app)
+    //     .post('/hook')
+    //     .set('Accept', 'application/json')
+    //     .send({pryvApiEndpoint: testServerHook.apiEndpoint});
+    //     triggerId = responseHooks.body.triggerId;
+        
+    //     responseTrigger = await request(app)
+    //     .post('/trigger/' + triggerId)
+    //     .set('Accept', 'application/json')
+    //     .send(eventsChangedTrigger);
+        
+    //   });
+      
+    //   after((done) => {
+    //     setTimeout(() => {
+    //       testServer.stop(done);
+    //     },1000)
+    //   });
+      
+    //   after(() => {
+    //     setTimeout(() => {
+    //       dataStorage.deleteAllEvents(triggerId);
+    //       dataStorage.deleteStreams(triggerId);
+    //       dataStorage.deleteHook(triggerId);
+    //       stateStorage.deleteHook(triggerId);
+    //     }, 900);
+        
+        
+    //   });
+      
+      
+    //   it('must return a valid response', () => {
+    //     should.exist(responseHooks);
+    //     should.exist(responseHooks.body);
+    //     should.exist(responseHooks.body.result);
+    //     should.equal(responseHooks.body.result, "OK");
+    //     should.exist(responseHooks.status);
+    //     should.equal(responseHooks.status, 200);
+        
+    //     should.exist(responseTrigger);
+    //     should.exist(responseTrigger.body);
+    //     should.exist(responseTrigger.body.result);
+    //     should.equal(responseTrigger.body.result, "OK");
+    //     should.exist(responseTrigger.status);
+    //     should.equal(responseTrigger.status, 200);
+    //   });
+      
+    //   it('must update streams in the DB', () => {
+    //     setTimeout(() => {
+    //       should.exist(dataStorage.selectAllStreams(triggerId));
+    //       should.exist(dataStorage.selectAllStreams(triggerId)['streamsData']);
+    //       should.equal(dataStorage.selectAllStreams(triggerId)['streamsData'], JSON.stringify(updateStream.streams));
+    //     }, 800);
+        
+    //   });
+
+    // });
+
   });
   
   
@@ -293,6 +365,8 @@ function helperStream(){
       return newStream;
     }
     return updateStream;
+    default:
+      return newStream;
   }
   
   

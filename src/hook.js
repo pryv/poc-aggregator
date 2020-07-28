@@ -6,6 +6,8 @@ const tasks = require('./tasks.js');
 const baseTriggerUrl = config.get('service:baseUrl') + 'trigger/';
 const cuid = require('cuid');
 const listners = require('./data-change');
+const ConnectionError = require('./errors/ConnectionError');
+const errorIds = require('./errors/ErrorIds');
 
 /**
  * 1. Create Web Hook 
@@ -13,12 +15,33 @@ const listners = require('./data-change');
  * 3. Add to tasks queue 
  */
 exports.create = async function (pryvApiEndpoint, eventsQuery) {
-  const conn = new Pryv.Connection(pryvApiEndpoint);
-
+  let conn
+  try{
+    conn = new Pryv.Connection(pryvApiEndpoint);
+  }
+  catch(e){
+    throw new ConnectionError(errorIds.ApiInvalid, 'Cannot find endpoint, invalid pryvApiEndpoint', pryvApiEndpoint, 400);
+  }
   // get access Info (necessary to find out the access.id)
-  const accessInfo = await conn.get('access-info');
+  let accessInfo;
+  try{
+
+    accessInfo = await conn.get('access-info');
+  }
+  catch(e){
+    if(e.message == "Cannot find endpoint, invalid URL format"){
+      throw new ConnectionError(errorIds.ApiInvalid,'Cannot find endpoint, invalid pryvApiEndpoint',pryvApiEndpoint, 400)
+    }
+    else if(e.message.includes('Forbidden')){
+      throw new ConnectionError(errorIds.Forbidden, 'Access token not valid', pryvApiEndpoint, 403)
+    }
+    else{
+      throw new ConnectionError(errorIds.ApiInvalid,'Cannot find endpoint, invalid pryvApiEndpoint',pryvApiEndpoint, 400)
+    }
+  }
   if (! accessInfo || accessInfo.type !== 'app') {
-    throw new Error('pryvApiEndpoint is invalid');
+    throw new ConnectionError(errorIds.ApiInvalid,'Cannot find endpoint, invalid pryvApiEndpoint',pryvApiEndpoint, 400)
+    //throw new Error('pryvApiEndpoint is invalid');
   }
 
   // here we could also check the validity and the scope of the access
@@ -51,7 +74,8 @@ exports.create = async function (pryvApiEndpoint, eventsQuery) {
   }
 
   if (!webhookDetails || !webhookDetails.id ) { 
-    throw new Error('Failed creating WebHook');
+    throw new ConnectionError(errorIds.HookIssue,"Failed to create a Webhook",pryvApiEndpoint,500);
+    //throw new Error('Failed creating WebHook');
   }
   stateStorage.addHook(
     triggerId, webhookDetails.id, pryvApiEndpoint, 

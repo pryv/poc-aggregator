@@ -51,7 +51,8 @@
       }
     ],
     
-    "trigger" : {
+    "triggers" : [
+      {
       "messages": [
         
         "streamsChanged"
@@ -61,7 +62,19 @@
         "serial": "20190802",
         "serverTime": 1586845324.691
       }
+    },
+    {
+      "messages": [
+        
+        "eventsChanged"
+      ],
+      "meta": {
+        "apiVersion": "1.4.11",
+        "serial": "20190802",
+        "serverTime": 1586845324.691
+      }
     }
+    ]
   },
   "mockServer" : {
     "access-info" : {

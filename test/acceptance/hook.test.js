@@ -152,16 +152,19 @@ describe('hooks', () => {
       });
 
       it('must the hook on Pryv.io be unchanged', async () => {
-        const id = response.body.webhook.id;
-        const pryvHookResponseAfterSecondCall = await request(userHook.apiEndpoint)
-          .get('webhooks/' + id)
-          .set('Accept', 'application/json')
-          .send();
-        should.exist(pryvHookResponseAfterSecondCall);
-        should.exist(pryvHookResponseAfterSecondCall.status);
-        should.equal(pryvHookResponseAfterSecondCall.status, 200);
-        should.exist(pryvHookResponseAfterSecondCall.body.webhook);
-        should.deepEqual(pryvHookResponseAfterSecondCall.body.webhook, pryvHookResponse.body.webhook);
+        setTimeout(async () => {
+          const id = response.body.webhook.id;
+          const pryvHookResponseAfterSecondCall = await request(userHook.apiEndpoint)
+            .get('webhooks/' + id)
+            .set('Accept', 'application/json')
+            .send();
+          should.exist(pryvHookResponseAfterSecondCall);
+          should.exist(pryvHookResponseAfterSecondCall.status);
+          should.equal(pryvHookResponseAfterSecondCall.status, 200);
+          should.exist(pryvHookResponseAfterSecondCall.body.webhook);
+          should.deepEqual(pryvHookResponseAfterSecondCall.body.webhook, pryvHookResponse.body.webhook);
+
+        },400);
       });
     });
 
@@ -183,7 +186,7 @@ describe('hooks', () => {
           should.exist(response.status);
           should.equal(response.status, 400);
           should.exist(response.text);
-          should.equal(response.text, "Cannot find endpoint, invalid pryvApiEndpoint");
+          should.equal(response.text, "api-invalid: : Cannot find endpoint, invalid pryvApiEndpoint");
         });
 
         it('must the local SQLite DB hooks table be unchanged', async () => {
@@ -234,7 +237,7 @@ describe('hooks', () => {
           should.exist(response.status);
           should.equal(response.status, 400);
           should.exist(response.text);
-          should.equal(response.text, "Cannot find endpoint, invalid pryvApiEndpoint");
+          should.equal(response.text, "api-invalid: "+wrongAddressHook.apiEndpoint+ ": Cannot find endpoint, invalid pryvApiEndpoint");
         });
 
         it('must the local SQLite DB hooks table be unchanged', async () => {
@@ -258,9 +261,9 @@ describe('hooks', () => {
         it('must return a valid response', () => {
           should.exist(response);
           should.exist(response.status);
-          should.equal(response.status, 400);
+          should.equal(response.status, 403);
           should.exist(response.text);
-          should.equal(response.text, "Access token not valid");
+          should.equal(response.text, "forbidden: https://0000000000000000000000000@aggregatorpryv.pryv.me/: Access token not valid");
         });
 
         it('must the local SQLite DB hooks table be unchanged', async () => {

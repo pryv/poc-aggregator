@@ -49,6 +49,8 @@ class DataListenerConsole extends DataChangesListenersInterface { 
         'DELETE FROM events WHERE triggerId = @triggerId AND eventId = @eventId'),
       deleteAllEvents : db.prepare(
         'DELETE FROM events WHERE triggerId = @triggerId'),
+      selectAllEvents : db.prepare(
+        'SELECT eventData FROM events WHERE triggerId = @triggerId'),
       newOrUpdateStreams: db.prepare(
         'INSERT OR REPLACE INTO streams (triggerId, streamsData) VALUES (@triggerId, @streamsData)'),
       selectAllStreams : db.prepare(
@@ -121,6 +123,10 @@ class DataListenerConsole extends DataChangesListenersInterface { 
 
   deleteAllEvents(triggerId){
     this.queries.deleteAllEvents.run({triggerId});
+  }
+
+  selectAllEvents(triggerId){
+    this.queries.selectAllEvents.get({triggerId});
   }
 
   /**
