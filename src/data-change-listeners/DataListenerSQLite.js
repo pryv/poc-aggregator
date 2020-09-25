@@ -1,12 +1,13 @@
 
 
 const logger = require('../utils/logging');
-const { DataChangesNames, DataChangesListenersInterface } = require('./DataChangesDefinitions');
+const DataChangesCodes = require('./DataChangeCodes');
+const DataListenerInterface = require('./DataListenerInterface');
 const Pryv = require('pryv');
 
 
 
-class DataListenerConsole extends DataChangesListenersInterface { 
+class DataListenerConsole extends DataListenerInterface { 
 
   constructor(emitter, params) {
     super(emitter, params);
@@ -53,11 +54,11 @@ class DataListenerConsole extends DataChangesListenersInterface { 
 
     // --------------- Register Event Listener 
 
-    this.emitter.on(DataChangesNames.HOOK.NEW, this.newHook.bind(this));
-    this.emitter.on(DataChangesNames.HOOK.DELETE, this.deleteHook.bind(this));
-    this.emitter.on(DataChangesNames.EVENT.NEW_OR_UPDATE, this.newOrUpdateEvent.bind(this));
-    this.emitter.on(DataChangesNames.EVENT.DELETE, this.deleteEvent.bind(this));
-    this.emitter.on(DataChangesNames.STREAMS.NEW_OR_UPDATE, this.newOrUpdateStreams.bind(this));
+    this.emitter.on(DataChangesCodes.HOOK.NEW, this.newHook.bind(this));
+    this.emitter.on(DataChangesCodes.HOOK.DELETE, this.deleteHook.bind(this));
+    this.emitter.on(DataChangesCodes.EVENT.NEW_OR_UPDATE, this.newOrUpdateEvent.bind(this));
+    this.emitter.on(DataChangesCodes.EVENT.DELETE, this.deleteEvent.bind(this));
+    this.emitter.on(DataChangesCodes.STREAMS.NEW_OR_UPDATE, this.newOrUpdateStreams.bind(this));
     logger.info('DataListener using Console');
   }
 

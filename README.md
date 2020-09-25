@@ -44,7 +44,7 @@ While Pryv.io is designed to store and manage data per-individual / per-consent,
     - **host**: the interface to use. for all:  `0.0.0.0`, for localhost only: `127.0.0.1`
   - **service**: Url to reach the aggregator service, if no SSL termination: **http://{hostname}:{port}/**
   - **state-storage**: Choose **one** stage storage to use, see stage storage bellow
-  - **data-listeners**: Array of **data listeners** to use, more informations bellow
+  - **data-change-listeners**: Array of **data listeners** to use, more informations bellow
 
 #### Configuration, State Storage
 
@@ -67,7 +67,7 @@ To implement your own State Storage, look at `src/state-storage`
 A Data Listener, register to data change and take actions, for example `DataListenerConsole`prints outs changes and `DataListenerSQLite` keeps streams and events data in a local database.
 
 ```json
-"data-listeners": [
+"data-change-listeners": [
     {
       "module": "DataListenerConsole",
       "params": {}
@@ -82,7 +82,7 @@ A Data Listener, register to data change and take actions, for example `DataList
   ]
 ```
 
-To implement your own Data Listener, look at `src/data-listeners`
+To implement your own Data Listener, look at `src/data-change-listeners`
 
 ## Run
 
@@ -112,10 +112,21 @@ Result:
 
 
 
+
+
 ## Test
 
 `npm run test`
 
-### License
+# Contribute
+
+Contributions are welcome. 
+The architecture has been made modular to facilitate extension.
+
+## Design
+
+
+
+# License
 
 BSD-3 Clause

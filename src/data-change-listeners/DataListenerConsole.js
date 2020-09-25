@@ -1,22 +1,23 @@
 
 const logger = require('../utils/logging');
 
-const { DataChangesNames, DataChangesListenersInterface } = require('./DataChangesDefinitions');
+const DataChangesCodes = require('./DataChangeCodes');
+const DataListenerInterface = require('./DataListenerInterface');
 
 function log(triggerId, call, msg) {
   logger.info('Listener [' + triggerId + '] - ' + call + ' > ' + msg);
 }
 
 
-class DataListenerConsole extends DataChangesListenersInterface { 
+class DataListenerConsole extends DataListenerInterface { 
 
   constructor(emitter, params) {
     super(emitter, params);
-    this.emitter.on(DataChangesNames.HOOK.NEW, this.newHook);
-    this.emitter.on(DataChangesNames.HOOK.DELETE, this.deleteHook);
-    this.emitter.on(DataChangesNames.EVENT.NEW_OR_UPDATE, this.newOrUpdateEvent);
-    this.emitter.on(DataChangesNames.EVENT.DELETE, this.deleteEvent);
-    this.emitter.on(DataChangesNames.STREAMS.NEW_OR_UPDATE, this.newOrUpdateStreams);
+    this.emitter.on(DataChangesCodes.HOOK.NEW, this.newHook);
+    this.emitter.on(DataChangesCodes.HOOK.DELETE, this.deleteHook);
+    this.emitter.on(DataChangesCodes.EVENT.NEW_OR_UPDATE, this.newOrUpdateEvent);
+    this.emitter.on(DataChangesCodes.EVENT.DELETE, this.deleteEvent);
+    this.emitter.on(DataChangesCodes.STREAMS.NEW_OR_UPDATE, this.newOrUpdateStreams);
     logger.info('DataListener using Console');
   }
 

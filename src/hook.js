@@ -5,7 +5,7 @@ const config = require('./utils/config.js');
 const tasks = require('./tasks.js');
 const baseTriggerUrl = config.get('service:baseUrl') + 'trigger/';
 const cuid = require('cuid');
-const listners = require('./data-change');
+const dataChangeEmiter = require('./data-change-emiter');
 
 /**
  * 1. Create Web Hook 
@@ -58,7 +58,7 @@ exports.create = async function (pryvApiEndpoint, eventsQuery) {
     triggerId, webhookDetails.id, pryvApiEndpoint, 
     eventsQuery, stateStorage.status.ACTIVE, webhookDetails);
   
-  listners.newHook(triggerId, {pryvApiEndpoint, hook: webhookDetails});
+  dataChangeEmiter.newHook(triggerId, {pryvApiEndpoint, hook: webhookDetails});
   tasks.addTasks(triggerId, [tasks.Changes.ACTIVATE, tasks.Changes.STREAMS, tasks.Changes.EVENTS]);
   return { result: 'OK', actionMsg: actionMsg, webhook: webhookDetails, triggerId: triggerId};
 };

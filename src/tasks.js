@@ -8,7 +8,7 @@
 const logger = require('./utils/logging');
 const storage = require('./state-storage/');
 const Pryv = require('pryv');
-const listners = require('./data-change');
+const dataChangeEmiter = require('./data-change-emiter');
 
 const queue = []; // in-order triggerIds to process
 const tasks = {}; // key - value set of tasks per triggerIds
@@ -118,13 +118,13 @@ async function activateHook(triggerId, conn, hook) {
   }]);
   if (res && res[0] && res[0].webhook) {
     await storage.updateHookDetail(triggerId, res[0].webhook);
-    listners.newHook(triggerId, {pryvApiEndpoint: conn.apiEndpoint, hook: res[0].webhook});
+    dataChangeEmiter.newHook(triggerId, {pryvApiEndpoint: conn.apiEndpoint, hook: res[0].webhook});
   }
 }
 
 async function getStreams(triggerId, conn, hook) {
   const result = await conn.get('streams');
-  listners.newStreams(triggerId, result.streams);
+  dataChangeEmiter.newStreams(triggerId, result.streams);
 }
 
 async function getEvents(triggerId, conn, hook) {
@@ -143,9 +143,9 @@ async function getEvents(triggerId, conn, hook) {
       lastModified = event.modified;
     }
     if (event.deleted) {
-      listners.deletedEvent(triggerId, event);
+      dataChangeEmiter.deletedEvent(triggerId, event);
     } else { 
-      listners.newOrUpdateEvent(triggerId, event);
+      dataChangeEmiter.newOrUpdateEvent(triggerId, event);
     }
   }
   await conn.getEventsStreamed(queryParams, forEachEvent);

@@ -13,7 +13,7 @@
       "log": false
     }
   },
-  "data-listeners": [
+  "data-change-listeners": [
     {
       "module": "DataListenerConsole",
       "params": {}

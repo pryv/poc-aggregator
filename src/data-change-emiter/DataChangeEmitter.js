@@ -1,6 +1,6 @@
 
 const EventEmitter = require('events');
-const { DataChangesNames } = require('./DataChangesDefinitions');
+const DataChangesCodes = require('../data-change-listeners/DataChangeCodes');
 
 class DataChangeEmitter extends EventEmitter {
 
@@ -9,7 +9,7 @@ class DataChangeEmitter extends EventEmitter {
     super();
     this.dataListeners = [];
     dataListenersSettings.forEach((dataListenerSettings) => {
-      const DataListener = require('./' + dataListenerSettings.module);
+      const DataListener = require('../data-change-listeners/' + dataListenerSettings.module);
       this.dataListeners.push(new DataListener(this, dataListenerSettings.params))
     });
   }
@@ -33,7 +33,7 @@ class DataChangeEmitter extends EventEmitter {
    * @param {Hook} data.hook
    */
   newHook(triggerId, data) {
-    this.emit(DataChangesNames.HOOK.NEW, triggerId, data);
+    this.emit(DataChangesCodes.HOOK.NEW, triggerId, data);
   }
 
   /**
@@ -43,7 +43,7 @@ class DataChangeEmitter extends EventEmitter {
    * @param {string} triggerId 
    */
   deleteHook(triggerId) {
-    this.emit(DataChangesNames.HOOK.DELETE, triggerId);
+    this.emit(DataChangesCodes.HOOK.DELETE, triggerId);
   }
 
   /**
@@ -54,7 +54,7 @@ class DataChangeEmitter extends EventEmitter {
    * @param {Object} event // following Pryv.io's Event structure
    */
   newOrUpdateEvent(triggerId, event) {
-    this.emit(DataChangesNames.EVENT.NEW_OR_UPDATE, triggerId, event);
+    this.emit(DataChangesCodes.EVENT.NEW_OR_UPDATE, triggerId, event);
   }
 
   /**
@@ -67,7 +67,7 @@ class DataChangeEmitter extends EventEmitter {
    * @param {number} [event.deleted] Deleted time. ! Might not be available
    */
   deletedEvent(triggerId, event) {
-    this.emit(DataChangesNames.EVENT.DELETE, triggerId, event);
+    this.emit(DataChangesCodes.EVENT.DELETE, triggerId, event);
   }
 
   /**
@@ -78,7 +78,7 @@ class DataChangeEmitter extends EventEmitter {
    * @param {Object} streams
    */
   newStreams(triggerId, streams) {
-    this.emit(DataChangesNames.STREAMS.NEW_OR_UPDATE, triggerId, streams);
+    this.emit(DataChangesCodes.STREAMS.NEW_OR_UPDATE, triggerId, streams);
   }
 }
 
