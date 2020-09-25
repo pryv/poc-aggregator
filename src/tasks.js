@@ -130,7 +130,7 @@ async function getStreams(triggerId, conn, hook) {
 async function getEvents(triggerId, conn, hook) {
   const queryParams = {
     fromTime: - Number.MAX_VALUE,
-    setTime: Number.MAX_VALUE
+    toTime: Number.MAX_VALUE
   }
   Object.assign(queryParams, hook.eventsQuery);
   queryParams.includeDeletions = true;
