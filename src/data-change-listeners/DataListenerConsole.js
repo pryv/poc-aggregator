@@ -50,7 +50,8 @@ class DataListenerConsole extends DataListenerInterface { 
    * @param {Object} event
    */
   newOrUpdateEvent(triggerId, event) {
-    log(triggerId, 'New Event', event.id + ' ' + event.type + ' > ' + event.content);
+    const date = new Date(event.time * 1000);
+    log(triggerId, 'New Event', date + ' ' + event.id + ' ' + event.type + ' > ' + event.content);
   }
 
   /**
