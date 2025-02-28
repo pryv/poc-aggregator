@@ -126,7 +126,6 @@ The architecture has been made modular to facilitate extension.
 ## Design
 
 
+## License
 
-# License
-
-BSD-3 Clause
+[BSD-3-Clause](LICENSE)

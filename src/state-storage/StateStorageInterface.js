@@ -1,4 +1,10 @@
 /**
+ * @license
+ * Copyright (C) Pryv https://pryv.com
+ * This file is part of Pryv.io and released under BSD-Clause-3 License
+ * Refer to LICENSE file
+ */
+/**
  * Interface to implement state storages
  */
 class StateStorageInterface {
